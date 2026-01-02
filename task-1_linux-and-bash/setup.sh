@@ -50,7 +50,7 @@ apt-get install -y -qq \
 log INFO 'creating directory structure ...'
 
 mkdir -p ~/pantheon_tech/{scripts,configs,logs,temp}
-chmod 750 ~/pantheon_tech/scripts
+chmod 750 ~/pantheon_tech/scripts ~/pantheon_tech/logs
 
 # configure git
 log INFO "configuring git ..."
