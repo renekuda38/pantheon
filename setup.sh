@@ -49,8 +49,8 @@ apt-get install -y -qq \
 # create directory structure
 log INFO 'creating directory structure ...'
 
-mkdir -p ~/pantheon_tech/{scripts,configs,logs,temp}
-chmod 750 ~/pantheon_tech/scripts ~/pantheon_tech/logs
+mkdir -p ~/pantheon/{scripts,configs,logs,temp}
+chmod 750 ~/pantheon/scripts ~/pantheon_tech/logs
 
 # configure git
 log INFO "configuring git ..."
