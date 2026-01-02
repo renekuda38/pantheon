@@ -3,16 +3,18 @@
 set -euo pipfail
 
 # logging fuction
-function log(): 
+function log() 
+{
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$1] ${*:2}"
+}
 
 # check for required environment variables for git configuration
 if [ -z "${GIT_EMAIL:-}" ] || [ -z "${GIT_USERNAME:-}" ]; then
   log ERROR "GIT_EMAIL and GIT_USERNAME environment variables are not set!"
 
-  echo -e "create a .env file in $(dirname "$(dirname "${BASH_SOURCE[0]}")") with the following content:\n\n"
-  echo "GIT_EMAIL=\"your-email@example.com\""
-  echo -e "GIT_USERNAME=\"Your Name\"\n\n"
+  echo -e "\ncreate a .env file in $(dirname "${BASH_SOURCE[0]}") with the following content:\n\n"
+  echo "    GIT_EMAIL=\"your-email@example.com\""
+  echo -e "    GIT_USERNAME=\"Your Name\"\n\n"
   echo "Then run: source .env before executing this script"
 
   exit 1
