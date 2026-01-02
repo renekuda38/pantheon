@@ -8,8 +8,10 @@ function log()
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$1] ${*:2}"
 }
 
+# get directory where script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# check if .env file exists and source it (if .env exists)
 if [ -f "${SCRIPT_DIR}/.env" ]; then
   source "${SCRIPT_DIR}/.env"
 else
@@ -17,7 +19,7 @@ else
   exit 1
 fi
 
-# check for required environment variables for git configuration
+# check for required environment variables for git configuration (if env vars are set in .env)
 if [ -z "${GIT_EMAIL:-}" ] || [ -z "${GIT_USERNAME:-}" ]; then
   log ERROR "GIT_EMAIL and GIT_USERNAME environment variables are not set!"
 
