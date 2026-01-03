@@ -1,0 +1,4 @@
+# define dependencies, will be installed with pckg mngr
+fastapi==0.115.0
+uvicorn==0.30.0 # server na spustenie fastapi
+psycopg2-binary==2.9.9 # na pripojenie s postresql, binary - pre-compiled
