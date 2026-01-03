@@ -3,9 +3,9 @@
 
 from fastapi import FastAPI, HTTPException # HTTP error handling
 from typing import List
-from models import TaskCreate, TaskUpdate, TaskResponse # validacia
-from database import test_db_connection
-from crud import (
+from taskmaster_api.models import TaskCreate, TaskUpdate, TaskResponse # validacia
+from taskmaster_api.database import test_db_connection
+from taskmaster_api.crud import (
     create_task_db,
     get_all_tasks_db,
     get_task_by_id_db,

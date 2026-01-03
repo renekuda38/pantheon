@@ -1,10 +1,10 @@
 # backend/crud.py
 
-from database import get_db_connection
+from taskmaster_api.database import get_db_connection
 
 # validovane objekty
 # crud.py ich pouzije na INSERT/UPDATE
-from models import TaskCreate, TaskUpdate
+from taskmaster_api.models import TaskCreate, TaskUpdate
 
 # RETURNING - vracia riadok po vytvoreni, updateovani a mazani
 
