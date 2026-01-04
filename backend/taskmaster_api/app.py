@@ -22,13 +22,13 @@ app = FastAPI(
 
 # ============= HEALTH ENDPOINTS =============
 
-@app.get("/")
-def read_root():
+@app.get("/health")
+def health_check():
     """Root endpoint - zakladny health check"""
     return {"status": "healthy", "message": "Task Manager API is running"}
 
-@app.get("/health")
-def health_check():
+@app.get("/db-health")
+def db_health_check():
     """Health check s DB testom"""
     db_status = test_db_connection()
     
