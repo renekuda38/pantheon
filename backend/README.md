@@ -28,6 +28,8 @@ FastAPI task management application with PostgreSQL backend.
 ```bash
    cd backend
    uv pip install -r requirements.lock
+   # or in development (check 🧪 Development section below)
+   uv pip install -e ".[dev]"
 ```
 
 4. **Configure environment**
@@ -38,7 +40,7 @@ FastAPI task management application with PostgreSQL backend.
 
 5. **Run application**
 ```bash
-   uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+   uvicorn taskmaster_api.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ## 🏥 Health Check
@@ -89,3 +91,4 @@ backend/
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@localhost:5432/db` |
+
