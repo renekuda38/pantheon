@@ -20,13 +20,20 @@ function check_jenkins()
     log INFO "checking Jenkins health at ${url} ..."
 
     # curl with timeout and fail on HTTP errors
-    HTTP_STATUS=$(curl -f -s --max-time 5 -w "%{http_code}" -o /dev/null "${url}")
-    CURL_EXIT_CODE=$?
+    HTTP_STATUS=$(curl -f -s --max-time 5 -w "%{http_code}" -o /dev/null "${url}") || URL_EXIT_CODE=$?
+    CURL_EXIT_CODE=${URL_EXIT_CODE:-0}
 
     if [ "${CURL_EXIT_CODE}" -ne 0 ]; then
-        log SUCCESS "Jenkins is healthy and reachable at ${url}"
+        log ERROR "failed to connect to Jenkins at ${url}) (curl exit code: ${CURL_EXIT_CODE})"
         echo ""
-        log INFO "Jenkins healthcheck completed successfully."
+        log ERROR "Jenkins healthcheck failed."
+        exit 1
+    fi
+
+    if [ "${HTTP_STATUS}" -eq 200 ]; then
+        log SUCCESS "Jenkins is healthy and reachable at ${url} (HTTP ${HTTP_STATUS})"
+        echo ""
+        log SUCCESS "Jenkins healthcheck passed."
         exit 0
     else 
         log ERROR "Jenkins is not responding at ${url}"
