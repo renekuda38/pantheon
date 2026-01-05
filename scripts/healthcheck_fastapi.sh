@@ -4,24 +4,43 @@ set -euo pipefail
 
 URL="${1:-http://localhost:8000/health}"
 
+MAX_RETRIES=3
+RETRY_DELAY=2
+
 log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$1] ${*:2}"
+    if [[ "${1}" == "ERROR" ]]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$1] ${*:2}" >&2
+    else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$1] ${*:2}"
+    fi
 }
 
 log "INFO" "starting FastAPI healthcheck for ${URL} ..."
 
-HTTP_STATUS=$(curl -f -s --max-time 5 -w "%{http_code}" -o /dev/null "${URL}") || CURL_EXIT_CODE=$?
-CURL_EXIT_CODE=${CURL_EXIT_CODE:-0}
+for i in $(seq 1 $MAX_RETRIES); do
 
-if [ "${CURL_EXIT_CODE}" -ne 0 ]; then
-    log "ERROR" "healthcheck failed to connect to ${URL} (curl exit code: ${CURL_EXIT_CODE})"
-    exit 1
-fi
+    echo "ATTEMPT ${i}/${MAX_RETRIES}:"
 
-if [ "${HTTP_STATUS}" -eq 200 ]; then
-    log "SUCCESS" "healthy and reachable at ${URL} (HTTP ${HTTP_STATUS})"
-    exit 0
-else
-    log "ERROR" "unhealthy at ${URL} (HTTP ${HTTP_STATUS})"
-    exit 1
-fi
+    set +e
+    HTTP_STATUS=$(curl -s --max-time 5 -w "%{http_code}" -o /dev/null "${URL}") 
+    CURL_EXIT_CODE=$?
+    set -e
+
+    # network check (liveness)
+    if [ "${CURL_EXIT_CODE}" -ne 0 ]; then
+        log "ERROR" "healthcheck failed to connect to ${URL} (curl exit code: ${CURL_EXIT_CODE})"
+        sleep $RETRY_DELAY
+        continue
+    fi
+
+    # http check (readiness)
+    if [ "${HTTP_STATUS}" -eq 200 ]; then
+        log "SUCCESS" "healthy and reachable at ${URL} (HTTP ${HTTP_STATUS})"
+        exit 0
+    else
+        log "ERROR" "unhealthy at ${URL} (HTTP ${HTTP_STATUS})"
+        sleep $RETRY_DELAY
+    fi
+done
+
+exit 1

@@ -4,13 +4,14 @@ set -euo pipefail
 
 JENKINS_URL="${JENKINS_URL:-http://localhost:8080}"
 
+MAX_RETRIES=3
+RETRY_DELAY=2
 
 # logging fuction
 function log()
 {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$1] ${*:2}"
 }
-
 
 # heathcheck function
 function check_jenkins()
@@ -19,28 +20,40 @@ function check_jenkins()
 
     log INFO "checking Jenkins health at ${url} ..."
 
-    # curl with timeout and fail on HTTP errors
-    HTTP_STATUS=$(curl -f -s --max-time 5 -w "%{http_code}" -o /dev/null "${url}") || URL_EXIT_CODE=$?
-    CURL_EXIT_CODE=${URL_EXIT_CODE:-0}
+    for i in $(seq 1 $MAX_RETRIES); do
 
-    if [ "${CURL_EXIT_CODE}" -ne 0 ]; then
-        log ERROR "failed to connect to Jenkins at ${url}) (curl exit code: ${CURL_EXIT_CODE})"
-        echo ""
-        log ERROR "Jenkins healthcheck failed."
-        exit 1
-    fi
+        echo "ATTEMPT ${i}/${MAX_RETRIES}:"
 
-    if [ "${HTTP_STATUS}" -eq 200 ]; then
-        log SUCCESS "Jenkins is healthy and reachable at ${url} (HTTP ${HTTP_STATUS})"
-        echo ""
-        log SUCCESS "Jenkins healthcheck passed."
-        exit 0
-    else 
-        log ERROR "Jenkins is not responding at ${url}"
-        echo ""
-        log ERROR "Jenkins healthcheck failed."
-        exit 1
-    fi
+        # curl with timeout and fail on HTTP errors
+        set +e
+        HTTP_STATUS=$(curl -s --max-time 5 -w "%{http_code}" -o /dev/null "${URL}") 
+        CURL_EXIT_CODE=$?
+        set -e
+
+        # network check (liveness)
+        if [ "${CURL_EXIT_CODE}" -ne 0 ]; then
+            log ERROR "failed to connect to Jenkins at ${url}) (curl exit code: ${CURL_EXIT_CODE})"
+            echo ""
+            log ERROR "Jenkins healthcheck failed."
+            sleep $RETRY_DELAY
+            continue
+        fi
+
+        # http check (readiness)
+        if [ "${HTTP_STATUS}" -eq 200 ]; then
+            log SUCCESS "Jenkins is healthy and reachable at ${url} (HTTP ${HTTP_STATUS})"
+            echo ""
+            log SUCCESS "Jenkins healthcheck passed."
+            exit 0
+        else 
+            log ERROR "Jenkins is not responding at ${url}"
+            echo ""
+            log ERROR "Jenkins healthcheck failed."
+            sleep $RETRY_DELAY
+        fi
+    done
+
+    exit 1
 }
 
 # perform healthcheck
