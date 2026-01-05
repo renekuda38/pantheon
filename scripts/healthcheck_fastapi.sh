@@ -15,32 +15,40 @@ log() {
     fi
 }
 
-log "INFO" "starting FastAPI healthcheck for ${URL} ..."
+check_fastapi() {
+    local url=${1}
 
-for i in $(seq 1 $MAX_RETRIES); do
+    log INFO "checking app health at ${url} ..."
 
-    echo "ATTEMPT ${i}/${MAX_RETRIES}:"
+    for i in $(seq 1 $MAX_RETRIES); do
 
-    set +e
-    HTTP_STATUS=$(curl -s --max-time 5 -w "%{http_code}" -o /dev/null "${URL}") 
-    CURL_EXIT_CODE=$?
-    set -e
+        echo "ATTEMPT ${i}/${MAX_RETRIES}:"
 
-    # network check (liveness)
-    if [ "${CURL_EXIT_CODE}" -ne 0 ]; then
-        log "ERROR" "healthcheck failed to connect to ${URL} (curl exit code: ${CURL_EXIT_CODE})"
-        sleep $RETRY_DELAY
-        continue
-    fi
+        set +e
+        HTTP_STATUS=$(curl -s --max-time 5 -w "%{http_code}" -o /dev/null "${url}") 
+        CURL_EXIT_CODE=$?
+        set -e
 
-    # http check (readiness)
-    if [ "${HTTP_STATUS}" -eq 200 ]; then
-        log "SUCCESS" "healthy and reachable at ${URL} (HTTP ${HTTP_STATUS})"
-        exit 0
-    else
-        log "ERROR" "unhealthy at ${URL} (HTTP ${HTTP_STATUS})"
-        sleep $RETRY_DELAY
-    fi
-done
+        # network check (liveness)
+        if [ "${CURL_EXIT_CODE}" -ne 0 ]; then
+            log "ERROR" "healthcheck failed to connect to ${url} (curl exit code: ${CURL_EXIT_CODE})"
+            sleep $RETRY_DELAY
+            continue
+        fi
 
-exit 1
+        # http check (readiness)
+        if [ "${HTTP_STATUS}" -eq 200 ]; then
+            log "SUCCESS" "healthy and reachable at ${url} (HTTP ${HTTP_STATUS})"
+            exit 0
+        else
+            log "ERROR" "unhealthy at ${url} (HTTP ${HTTP_STATUS})"
+            sleep $RETRY_DELAY
+        fi
+    done
+
+    exit 1
+}
+
+check_fastapi "${URL}"
+
+log "INFO" "starting FastAPI healthcheck for ${url} ..."
