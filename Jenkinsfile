@@ -2,6 +2,8 @@ pipeline {
     agent any
 
     environment {
+        PATH = "/var/jenkins_home/.local/bin:${env.PATH}"
+
         DOCKER_IMAGE = "taskmaster_api"
         DOCKER_TAG = "${env.BUILD_NUMBER}"
 
