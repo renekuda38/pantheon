@@ -53,9 +53,12 @@ pipeline {
 
                         # testy pridame neskor 
 
+                        echo 'testing imports ...'
                         python -c "from taskmaster_api import app; print('app imports successfully')"
 
-                        python -m py_compile app.py crud.py database.py models.py
+                        echo 'syntax validation for all python files ...'
+                        find taskmaster_api -name "*.py" -exec python -m py_compile {} +
+                        
                         echo "all python files are syntactically correct"
                     '''
                 }
