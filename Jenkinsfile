@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'docker'
+    }
 
     environment {
         // add uv to PATH, later will be integrated in Dockerfile together with uv installation
