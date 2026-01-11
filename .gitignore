@@ -10,3 +10,6 @@ temp/
 
 # learning oriented file
 docker.output
+
+# macOS system file
+.DS_Store
