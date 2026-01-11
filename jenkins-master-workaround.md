@@ -80,8 +80,32 @@ exit
 
 ---
 
-### 5. Install uv for Jenkins User
+### 5. Fix Docker Socket Permissions
 
+**⚠️ Required to prevent "permission denied" errors during builds**
+```bash
+# Enter container as root
+docker exec -u root -it jenkins-master bash
+
+# Change socket group ownership to jenkins
+chown :jenkins /var/run/docker.sock
+
+# Verify jenkins user can access Docker
+su - jenkins -c "docker ps"
+
+# Exit
+exit
+```
+
+**Why this is needed:**
+- Docker socket is owned by `root:root` in container
+- Jenkins user can't access it → "permission denied"
+- `chown :jenkins` allows jenkins user to use Docker
+- ⚠️ This change persists across container restarts (mounted volume)
+
+---
+
+### 6. Install uv for Jenkins User
 ```bash
 # Enter container as jenkins user
 docker exec -u jenkins -it jenkins-master bash
@@ -107,7 +131,6 @@ docker restart jenkins-master
 ## Verification
 
 Test that everything works:
-
 ```bash
 # Enter as jenkins user
 docker exec -u jenkins -it jenkins-master bash
@@ -140,14 +163,14 @@ exit
 Once you have proper agents running:
 
 1. Remove tools from master:
-   ```bash
+```bash
    docker exec -u root -it jenkins-master bash
    apt-get remove -y docker.io
    exit
-   ```
+```
 
 2. Recreate master **without** Docker socket:
-   ```bash
+```bash
    docker stop jenkins-master
    docker rm jenkins-master
    
@@ -159,10 +182,10 @@ Once you have proper agents running:
      -p 50000:50000 \
      -v jenkins_home:/var/jenkins_home \
      jenkins/jenkins:lts-jdk17
-   ```
+```
 
 3. Update Jenkinsfiles to use agent labels instead of `agent any`
 
 ---
 
-**Remember:** This is a learning exercise. In production, Jenkins master should **never** run builds directly! 🚀
+**Remember:** This is a learning exercise. In production, Jenkins master should **never** run builds directly!
