@@ -81,6 +81,128 @@ docker exec jenkins-master jenkins-plugin-cli --plugins \
 
 ---
 
+## Jenkins Agents
+
+### Docker Agent Setup (Task 6)
+
+**Purpose:** Offload builds from master to dedicated agent with Docker capabilities.
+
+#### 1. Build Agent Image
+
+**Dockerfile.jenkins-agent:**
+```dockerfile
+FROM jenkins/inbound-agent
+
+USER root
+
+RUN apt-get update && apt-get install -y \
+    docker.io \
+    git \
+    python3 \
+    python3-pip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN usermod -aG docker jenkins
+
+USER jenkins
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/home/jenkins/.cargo/bin:${PATH}"
+
+WORKDIR /home/jenkins/agent
+```
+
+**Build:**
+```bash
+docker build -f Dockerfile.jenkins-agent -t jenkins-docker-agent:latest .
+```
+
+#### 2. Create Node in Jenkins UI
+
+**Manage Jenkins → Nodes → New Node**
+- Name: `docker-worker`
+- Type: **Permanent Agent**
+- Remote root directory: `/home/jenkins/agent`
+- Labels: `docker linux python`
+- Launch method: **Launch agent by connecting it to the controller**
+
+**Save → Copy SECRET from connection instructions**
+
+#### 3. Run Agent Container
+```bash
+docker run -d \
+  --name jenkins-agent-docker01 \
+  --restart unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jenkins-docker-agent:latest \
+  -url http://host.docker.internal:8080 \
+  -secret  \
+  -name docker-worker \
+  -workDir /home/jenkins/agent
+```
+
+**Parameters explained:**
+- `-v /var/run/docker.sock` - mount for Docker-in-Docker builds (⚠️ security risk)
+- `-url` - Jenkins master URL (`host.docker.internal` for Docker Desktop on macOS)
+- `-secret` - authentication token from Jenkins UI
+- `-name` - must match Jenkins node name exactly
+- `-workDir` - agent workspace directory
+
+#### 4. Use Agent in Pipeline
+
+**Jenkinsfile:**
+```groovy
+pipeline {
+    agent {
+        label 'docker'  // any agent with 'docker' label
+    }
+    // or
+    agent {
+        node 'docker-worker'  // specific node
+    }
+    
+    stages {
+        // your stages
+    }
+}
+```
+
+#### Troubleshooting
+
+**Permission denied: /var/run/docker.sock**
+```bash
+# macOS - check socket group:
+ls -la /Users/$USER/.docker/run/docker.sock
+
+# Fix: ensure --group-add matches socket GID
+docker inspect jenkins-agent-docker01 | grep -A5 GroupAdd
+```
+
+**Agent offline:**
+```bash
+# Check agent logs:
+docker logs jenkins-agent-docker01
+
+# Look for "Connected" message
+# Verify secret and node name match Jenkins UI
+```
+
+**uv not found in pipeline:**
+- Ensure `ENV PATH="/home/jenkins/.cargo/bin:${PATH}"` is in Dockerfile
+- Rebuild image after adding ENV line
+
+#### Security Notes
+
+⚠️ **Docker socket mount = root access to host!**
+- Current setup is for **dev/learning only**
+- Production alternatives:
+  - Docker-in-Docker (privileged container)
+  - Kaniko (rootless builds)
+  - Dedicated build VMs with SSH agents
+
+---
+
 ## Configuration
 
 ### Jenkins Home Structure
