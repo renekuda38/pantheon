@@ -3,6 +3,7 @@
 ## Table of Contents
 - [Local Development Setup](#local-development-setup)
 - [Plugin Management](#plugin-management)
+- [Jenkins Agents](#jenkins-agents)
 - [Backup & Recovery](#backup--recovery)
 
 ---
