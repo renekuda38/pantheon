@@ -7,3 +7,6 @@
 # Temporary files
 *.tmp
 temp/
+
+# learning oriented file
+docker.output
