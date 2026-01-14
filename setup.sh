@@ -137,7 +137,7 @@ log SUCCESS "python installed: $(python3 --version)"
 # ====================
 log INFO "checking uv installation..."
 
-if command -v uv &> /dev/null; then
+if [ -f "/root/.local/bin/uv" ]; then
   log SUCCESS "uv is already installed: $(uv --version)"
 else
   log INFO "installing uv ..."
@@ -146,7 +146,7 @@ else
   # Add uv to PATH for current session
   export PATH="/root/.local/bin:$PATH"
 
-  if [ -n "${SUDO_USER:-}" ]; then
+  if [ -n "${SUDO_USER:-}" ] && [ ! -f "/home/${SUDO_USER}/.local/bin/uv" ]; then
     # Install for sudo user as well
     su - "${SUDO_USER}" -c "curl -LsSf https://astral.sh/uv/install.sh | sh"
   else
