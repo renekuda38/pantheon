@@ -137,24 +137,29 @@ log SUCCESS "python installed: $(python3 --version)"
 # ====================
 log INFO "checking uv installation..."
 
+# Add uv to PATH for current session
+export PATH="/root/.local/bin:$PATH"
+
 if [ -f "/root/.local/bin/uv" ]; then
-  log SUCCESS "uv is already installed: $(uv --version)"
+  log SUCCESS "uv is already installed for user root: $(uv --version)"
 else
   log INFO "installing uv ..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
-
-  # Add uv to PATH for current session
-  export PATH="/root/.local/bin:$PATH"
-
-  if [ -n "${SUDO_USER:-}" ] && [ ! -f "/home/${SUDO_USER}/.local/bin/uv" ]; then
-    # Install for sudo user as well
-    su - "${SUDO_USER}" -c "curl -LsSf https://astral.sh/uv/install.sh | sh"
-  else
-    log WARN "Could not determine user - uv installed only for root user"
-  fi
-
-  log SUCCESS "uv installed successfully"
 fi
+
+# Install for sudo user as well
+if [ -n "${SUDO_USER:-}" ]; then
+  if [ -f "/home/${SUDO_USER}/.local/bin/uv" ]; then
+    log SUCCESS "uv is already installed for user ${SUDO_USER}: $(uv --version)"
+  else
+    su - "${SUDO_USER}" -c "curl -LsSf https://astral.sh/uv/install.sh | sh"
+  fi
+else
+  log WARN "Could not determine user - uv installed only for root user"
+fi
+
+log SUCCESS "uv installed successfully"
+
 
 # ====================
 # create runtime dirs
