@@ -119,12 +119,14 @@ systemctl start docker
 if [ -n "${SUDO_USER:-}" ]; then
   usermod -aG docker "${SUDO_USER}"
   log INFO "Added ${SUDO_USER} to docker group (logout and login to apply)"
+else
+  log WARN "could not determine user - docker group not configured"
 fi
 
 # ====================
 # install Python
 # ====================
-log INFO "Installing Python..."
+log INFO "installing Python ..."
 
 apt-get install -y -qq python3 python3-pip python3-venv python3-dev
 
@@ -138,7 +140,7 @@ log INFO "checking uv installation..."
 if command -v uv &> /dev/null; then
   log SUCCESS "uv is already installed: $(uv --version)"
 else
-  log INFO "Installing uv..."
+  log INFO "installing uv ..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
 
   # Add uv to PATH for current session
@@ -147,6 +149,8 @@ else
   if [ -n "${SUDO_USER:-}" ]; then
     # Install for sudo user as well
     su - "${SUDO_USER}" -c "curl -LsSf https://astral.sh/uv/install.sh | sh"
+  else
+    log WARN "Could not determine user - uv installed only for root user"
   fi
 
   log SUCCESS "uv installed successfully"
