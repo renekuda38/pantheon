@@ -150,6 +150,17 @@ docker run -d \
 - `-name` - must match Jenkins node name exactly
 - `-workDir` - agent workspace directory
 
+#### Security Notes
+
+⚠️ **Docker socket mount = root access to host!**
+- Current setup is for **dev/learning only**
+- Production alternatives:
+  - Docker-in-Docker (privileged container)
+  - Kaniko (rootless builds)
+  - Dedicated build VMs with SSH agents
+    
+---
+
 #### 4. Use Agent in Pipeline
 
 **Jenkinsfile:**
@@ -168,16 +179,6 @@ pipeline {
     }
 }
 ```
----
-
-#### Security Notes
-
-⚠️ **Docker socket mount = root access to host!**
-- Current setup is for **dev/learning only**
-- Production alternatives:
-  - Docker-in-Docker (privileged container)
-  - Kaniko (rootless builds)
-  - Dedicated build VMs with SSH agents
 
 ---
 
