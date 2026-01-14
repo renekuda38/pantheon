@@ -168,30 +168,7 @@ pipeline {
     }
 }
 ```
-
-#### Troubleshooting
-
-**Permission denied: /var/run/docker.sock**
-```bash
-# macOS - check socket group:
-ls -la /Users/$USER/.docker/run/docker.sock
-
-# Fix: ensure --group-add matches socket GID
-docker inspect jenkins-agent-docker01 | grep -A5 GroupAdd
-```
-
-**Agent offline:**
-```bash
-# Check agent logs:
-docker logs jenkins-agent-docker01
-
-# Look for "Connected" message
-# Verify secret and node name match Jenkins UI
-```
-
-**uv not found in pipeline:**
-- Ensure `ENV PATH="/home/jenkins/.cargo/bin:${PATH}"` is in Dockerfile
-- Rebuild image after adding ENV line
+---
 
 #### Security Notes
 
