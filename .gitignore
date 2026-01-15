@@ -13,3 +13,6 @@ docker.output
 
 # macOS system file
 .DS_Store
+
+# claude
+CLAUDE.md
