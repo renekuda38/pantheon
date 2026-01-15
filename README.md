@@ -11,7 +11,7 @@ All detailed project documentation is located in the docs/ directory. Please ref
 * **[DevOps Learning Plan](./docs/devops-learning-plan-tasks.md)**
   * A structured roadmap containing 11 tasks covering Linux basics, Python environment management, containerization, and CI/CD automation.
 * **[App and Environment Setup](./docs/app-virtual-env-uv.md)**
-  * Comprehensive instructions for managing the Python environment using the uv package manager, installing dependencies, and running the FastAPI application.
+  * Instructions for managing the Python environment using the uv package manager, installing dependencies, and running the FastAPI application.
 * **[Jenkins Setup](./docs/jenkins-setup.md)**
   * Documentation for local Jenkins development, including persistent volume creation, plugin management, and Docker agent configuration.
 * **[Jenkins Master Workaround](./docs/jenkins-master-workaround.md)**
