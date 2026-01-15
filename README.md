@@ -8,6 +8,8 @@ This project is a learning platform designed for developing and deploying a Fast
 
 All detailed project documentation is located in the docs/ directory. Please refer to the following files for specific instructions:
 
+* **[Setup Guide](./setup.md)**
+  * Quick reference for running the development environment setup script, including optional Git configuration.
 * **[DevOps Learning Plan](./docs/devops-learning-plan-tasks.md)**
   * A structured roadmap containing 11 tasks covering Linux basics, Python environment management, containerization, and CI/CD automation.
 * **[App and Environment Setup](./docs/app-virtual-env-uv.md)**
@@ -29,10 +31,10 @@ All detailed project documentation is located in the docs/ directory. Please ref
 
 ## Quick Start
 
-To initialize the project environment and run initial scripts, execute the setup script from the root:
+To set up the development environment (see [setup.md](./setup.md) for details), run:
 
 ```bash
 chmod +x setup.sh
-./setup.sh
+sudo ./setup.sh
 ```
 ---
