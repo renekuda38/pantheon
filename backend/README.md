@@ -2,31 +2,83 @@
 
 FastAPI task management application with PostgreSQL backend.
 
-## Docker
+## Quick Start (Docker Compose)
 
-### Build
+Run the full stack (API + PostgreSQL) with a single command:
 
 ```bash
-docker build -t taskmaster .
+cd backend
+docker compose up -d --build
 ```
 
-### Run
+This automatically:
+- Starts PostgreSQL with `init.sql` (creates table + 3 test records)
+- Builds and runs the FastAPI application
+- Connects both services via Docker network
+
+### Useful Commands
 
 ```bash
-docker run -p 8000:8000 -e DATABASE_URL="postgresql://user:pass@host:5432/db" taskmaster
+# Show logs
+docker compose logs -f
+
+# Logs for API only
+docker compose logs -f api
+
+# Stop stack
+docker compose down
+
+# Stop + delete volumes (reset database)
+docker compose down -v
+
+# Restart after code changes
+docker compose up -d --build
 ```
 
 ## Health Check
 
 ```bash
+# API health
 curl http://localhost:8000/health
-# Expected: {"status": "ok", "database": "connected"}
+
+# DB connection health
+curl http://localhost:8000/db-health
 ```
 
-Or use the health check script from the host:
+## API Endpoints
+
+### Create new task (POST)
 
 ```bash
-../scripts/healthcheck_fastapi.sh http://localhost:8000/health
+curl -X POST http://localhost:8000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"task_name": "New task", "task_desc": "Task description", "accomplish_time": 5}'
+```
+
+### List all tasks (GET)
+
+```bash
+curl http://localhost:8000/tasks
+```
+
+### Get task by ID (GET)
+
+```bash
+curl http://localhost:8000/tasks/1
+```
+
+### Update task (PUT)
+
+```bash
+curl -X PUT http://localhost:8000/tasks/1 \
+  -H "Content-Type: application/json" \
+  -d '{"done": true}'
+```
+
+### Delete task (DELETE)
+
+```bash
+curl -X DELETE http://localhost:8000/tasks/1
 ```
 
 ## API Documentation
@@ -34,6 +86,20 @@ Or use the health check script from the host:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
+## Manual Docker Build (without Compose)
+
+If you need to run just the API container standalone:
+
+```bash
+# Build
+docker build -t taskmaster .
+
+# Run (requires your own PostgreSQL)
+docker run -p 8000:8000 \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/db" \
+  taskmaster
+```
+
 ## Local Development
 
-For running without Docker (local venv setup), see [docs/app-virtual-env-uv.md](../docs/app-virtual-env-uv.md).
+For development without Docker Compose (local venv setup), see [docs/app-virtual-env-uv.md](../docs/app-virtual-env-uv.md).
