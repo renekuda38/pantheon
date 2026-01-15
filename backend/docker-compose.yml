@@ -1,0 +1,44 @@
+services:
+  # PostgreSQL databaza
+  db:
+    image: postgres:16-alpine
+    container_name: taskmaster-db
+    environment:
+      POSTGRES_USER: taskmaster
+      POSTGRES_PASSWORD: taskmaster123
+      POSTGRES_DB: taskmaster_db
+    ports:
+      - "5432:5432"
+    volumes:
+      # init.sql sa spusti automaticky pri prvom starte
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # persist data medzi restartami
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskmaster -d taskmaster_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI aplikacia
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskmaster-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://taskmaster:taskmaster123@db:5432/taskmaster_db
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres_data:
