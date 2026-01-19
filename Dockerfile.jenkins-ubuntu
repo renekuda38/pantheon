@@ -1,0 +1,66 @@
+FROM ubuntu:24.04
+
+# prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+USER root
+RUN apt-get update && apt-get install -y \
+    openjdk-17-jdk \
+    python3 \
+    python3-pip \
+    python3-venv \
+    git \
+    curl \
+    wget \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    # Docker CLI (without daemon)
+    && install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+    && chmod a+r /etc/apt/keyrings/docker.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli \
+    # cleanup 
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
+RUN groupadd docker
+
+# Create jenkins user (non-root)
+RUN useradd -m -s /bin/bash jenkins \
+    && usermod -aG docker jenkins
+
+# Switch to jenkins user pre uv installation
+USER jenkins
+WORKDIR /home/jenkins
+
+# Install uv as jenkins user
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Add uv to PATH
+ENV PATH="/home/jenkins/.local/bin:${PATH}"
+
+# Download Jenkins agent JAR
+RUN mkdir -p /home/jenkins/agent \
+    && curl -fsSL -o agent.jar http://host.docker.internal:8080/jnlpJars/agent.jar \
+    && test -f agent.jar \
+    && [ $(stat -c %s agent.jar) -gt 1000000 ] \
+    && java -jar agent.jar -version
+
+RUN java -version \
+    && uv --version \
+    && docker --version \
+    && ls -lh agent.jar
+
+# Set working directory
+WORKDIR /home/jenkins/agent
+
+# Expose Jenkins agent port (optional, for visibility)
+EXPOSE 50000
+
+# Entry point pre Jenkins agent
+# Note: Jenkins master poskytne URL, secret, name pri štarte
+ENTRYPOINT ["java", "-jar", "/home/jenkins/agent.jar"]
