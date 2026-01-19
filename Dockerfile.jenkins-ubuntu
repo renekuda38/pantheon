@@ -37,6 +37,8 @@ RUN useradd -m -s /bin/bash jenkins \
 USER jenkins
 WORKDIR /home/jenkins
 
+ENV SHELL=/bin/bash
+
 # Install uv as jenkins user
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
