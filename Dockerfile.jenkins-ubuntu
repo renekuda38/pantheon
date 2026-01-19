@@ -1,5 +1,7 @@
 FROM ubuntu:24.04
 
+ENV SHELL=/bin/bash
+
 # prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -36,8 +38,6 @@ RUN useradd -m -s /bin/bash jenkins \
 # Switch to jenkins user pre uv installation
 USER jenkins
 WORKDIR /home/jenkins
-
-ENV SHELL=/bin/bash
 
 # Install uv as jenkins user
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
