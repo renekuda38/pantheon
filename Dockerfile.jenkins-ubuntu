@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
     gnupg \
-    lsb-release \
+    lsb-release
 
 # Docker CLI (without daemon)
 RUN install -m 0755 -d /etc/apt/keyrings \
