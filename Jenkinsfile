@@ -27,8 +27,8 @@ pipeline {
 
                 dir('backend') {
                     sh '''
-                        #!/bin/bash
-                        
+                        #!/usr/bin/env bash
+
                         set -euo pipefail
                         
                         which uv || (echo "uv not found!" && exit 1)
