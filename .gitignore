@@ -22,3 +22,6 @@ docker.output
 
 # claude
 CLAUDE.md
+
+# old files
+*.old
