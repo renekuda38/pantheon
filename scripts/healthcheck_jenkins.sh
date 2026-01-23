@@ -24,8 +24,8 @@ log() {
 check_security_config() {
     # HTTPS insecure mode warning
     if [[ "${JENKINS_SKIP_SSL_VERIFY}" == "true" ]]; then
-        log WARN "⚠️  INSECURE MODE ENABLED - SSL certificate verification disabled!"
-        log WARN "⚠️  This should NEVER be used in production environments!"
+        log WARN "INSECURE MODE ENABLED - SSL certificate verification disabled!"
+        log WARN "This should NEVER be used in production environments!"
     fi
     
     if [[ -z "${JENKINS_USER}" ]] || [[ -z "${JENKINS_TOKEN}" ]]; then
