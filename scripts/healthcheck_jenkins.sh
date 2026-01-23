@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+  # Auto-load .env if exists
+  if [[ -f .env ]]; then
+      source .env
+  fi
+
 # Configuration
 JENKINS_URL="${JENKINS_URL:-http://localhost:8080}"
 JENKINS_USER="${JENKINS_USER:-}"

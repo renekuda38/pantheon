@@ -2,8 +2,13 @@
 
 set -euo pipefail
 
+  # Auto-load .env if exists
+  if [[ -f .env ]]; then
+      source .env
+  fi
+
 # Configuration
-URL="${1:-http://localhost:8000/health}"
+FASTAPI_URL="${1:-http://localhost:8000/health}"
 # not implemented yet, but placeholder for future use
 FASTAPI_TOKEN="${FASTAPI_TOKEN:-}"
 # do nothing if using HTTP (it could be false or true), works only for HTTPS
@@ -134,4 +139,4 @@ check_fastapi() {
 # Main execution
 log INFO "=== Starting FastAPI Healthcheck ==="
 check_security_config
-check_fastapi "${URL}"
+check_fastapi "${FASTAPI_URL}"
