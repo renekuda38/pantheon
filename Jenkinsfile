@@ -84,27 +84,97 @@ pipeline {
             }
         }
     }
-
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+                    echo '  🚀 DEPLOYING APPLICATION'
+                    echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+                    
+                    dir('backend') {
+                        // Stop existing deployment
+                        sh 'docker-compose down || true'
+                        
+                        // Remove old containers
+                        sh 'docker-compose rm -f || true'
+                        
+                        // Start all services
+                        sh 'docker-compose up -d'
+                        
+                        // Show status
+                        echo 'Container status:'
+                        sh 'docker-compose ps'
+                    }
+                    
+                    echo '✓ Deployment completed'
+                }
+            }
+        }
+        
+        stage('Healthcheck') {
+            steps {
+                script {
+                    echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+                    echo '  🏥 HEALTH CHECK VERIFICATION'
+                    echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+                    
+                    // Wait for containers to fully start
+                    echo 'Waiting for services to initialize...'
+                    sleep(time: 15, unit: 'SECONDS')
+                    
+                    // Check FastAPI liveness
+                    echo 'Checking FastAPI liveness...'
+                    sh '''
+                        chmod +x scripts/healthcheck_fastapi.sh
+                        ./scripts/healthcheck_fastapi.sh http://localhost:8000/health
+                    '''
+                    echo 'FastAPI process is running'
+                    
+                    // Check database readiness
+                    echo 'Checking database connection...'
+                    sh '''
+                        ./scripts/healthcheck_fastapi.sh http://localhost:8000/db-health
+                    '''
+                    echo 'Database connection verified'
+                    
+                    echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+                    echo '  ✅ ALL HEALTH CHECKS PASSED'
+                    echo '  • FastAPI: ✓ Running'
+                    echo '  • Database: ✓ Connected'
+                    echo '  • Status: Ready for traffic'
+                    echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+                }
+            }
+        }
+    }
+    
     post {
-        always {
-            echo '... cleaning up the workspace ...'
-            cleanWs()
-        }
         success {
-            echo """
-                    ╔════════════════════════════════════════╗
-                    ║          BUILD INFORMATION             ║
-                    ╠════════════════════════════════════════╣
-                    ║ Project: ${env.JOB_NAME}
-                    ║ Build:   #${env.BUILD_NUMBER}
-                    ║ Branch:  ${env.BRANCH_NAME}
-                    ║ Commit:  ${env.GIT_COMMIT.take(7)}
-                    ║ Author:  ${env.GIT_COMMITTER_NAME}
-                    ╚════════════════════════════════════════╝
-            """
+            echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+            echo '  🎉 PIPELINE COMPLETED SUCCESSFULLY'
+            echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+            echo "✓ Build: ${env.BUILD_NUMBER}"
+            echo "✓ Image: ${DOCKER_IMAGE}:${IMAGE_TAG}"
+            echo "✓ Health: All checks passed"
+            echo "✓ Access: http://localhost:8000"
+            echo "✓ Docs: http://localhost:8000/docs"
         }
+        
         failure {
-            echo 'PIPELINE FAILED! check logs above.'
+            echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+            echo '  ❌ PIPELINE FAILED'
+            echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+            
+            dir('backend') {
+                echo 'Recent container logs:'
+                sh 'docker-compose logs --tail=100 || true'
+            }
+        }
+        
+        always {
+            echo 'Cleaning up workspace...'
+            cleanWs()
         }
     }
 }
