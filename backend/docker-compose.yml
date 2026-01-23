@@ -4,9 +4,9 @@ services:
     image: postgres:16-alpine
     container_name: taskmaster-db
     environment:
-      POSTGRES_USER: taskmaster
-      POSTGRES_PASSWORD: taskmaster123
-      POSTGRES_DB: taskmaster_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -29,7 +29,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://taskmaster:taskmaster123@db:5432/taskmaster_db
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       db:
         condition: service_healthy
