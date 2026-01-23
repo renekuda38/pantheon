@@ -6,8 +6,9 @@ set -euo pipefail
 URL="${1:-http://localhost:8000/health}"
 # not implemented yet, but placeholder for future use
 FASTAPI_TOKEN="${FASTAPI_TOKEN:-}"
-FASTAPI_SKIP_SSL_VERIFY="${FASTAPI_SKIP_SSL_VERIFY:-false}"
 # do nothing if using HTTP (it could be false or true), works only for HTTPS
+# insecure mode
+FASTAPI_SKIP_SSL_VERIFY="${FASTAPI_SKIP_SSL_VERIFY:-false}" 
 VERBOSE="${VERBOSE:-false}"
 
 MAX_RETRIES=3
@@ -25,8 +26,8 @@ log() {
 # Security warnings
 check_security_config() {
     if [[ "${FASTAPI_SKIP_SSL_VERIFY}" == "true" ]]; then
-        log WARN "⚠️  INSECURE MODE ENABLED - SSL certificate verification disabled!"
-        log WARN "⚠️  This should NEVER be used in production environments!"
+        log WARN "INSECURE MODE ENABLED - SSL certificate verification disabled!"
+        log WARN "This should NEVER be used in production environments!"
     fi
     # not implemented yet
     if [[ -n "${FASTAPI_TOKEN}" ]]; then
