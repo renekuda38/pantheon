@@ -18,4 +18,5 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ENV PATH="/home/jenkins/.local/bin:${PATH}"
 
-WORKDIR /home/jenkins/agent
+# dat to vyssie? pred alebo za USER jenkins riadok
+WORKDIR /home/jenkins/agent 
