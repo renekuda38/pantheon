@@ -1,4 +1,4 @@
-pipeline {
+pipeline {3
     agent {
         label 'docker'
     }
@@ -83,7 +83,6 @@ pipeline {
                 }
             }
         }
-    }
         
         stage('Deploy') {
             steps {
