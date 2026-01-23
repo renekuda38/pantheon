@@ -2,10 +2,13 @@
 
 set -euo pipefail
 
-  # Auto-load .env if exists
-  if [[ -f .env ]]; then
-      source .env
-  fi
+# get script directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# auto-load .env if exists (in script's directory)
+if [[ -f "${SCRIPT_DIR}/.env" ]]; then
+    source "${SCRIPT_DIR}/.env"
+fi
 
 # Configuration
 JENKINS_URL="${JENKINS_URL:-http://localhost:8080}"
