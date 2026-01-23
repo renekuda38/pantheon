@@ -123,20 +123,23 @@ pipeline {
                     echo 'Waiting for services to initialize...'
                     sleep(time: 15, unit: 'SECONDS')
                     
-                    // Check FastAPI liveness
-                    echo 'Checking FastAPI liveness...'
-                    sh '''
-                        chmod +x scripts/healthcheck_fastapi.sh
-                        ./scripts/healthcheck_fastapi.sh http://localhost:8000/health
-                    '''
-                    echo 'FastAPI process is running'
-                    
-                    // Check database readiness
-                    echo 'Checking database connection...'
-                    sh '''
-                        ./scripts/healthcheck_fastapi.sh http://localhost:8000/db-health
-                    '''
-                    echo 'Database connection verified'
+
+                    dir('scripts') {
+                        // Check FastAPI liveness
+                        echo 'Checking FastAPI liveness...'
+                        sh '''
+                            chmod +x scripts/healthcheck_fastapi.sh
+                            ./healthcheck_fastapi.sh http://localhost:8000/health
+                        '''
+                        echo 'FastAPI process is running'
+                        
+                        // Check database readiness
+                        echo 'Checking database connection...'
+                        sh '''
+                            ./healthcheck_fastapi.sh http://localhost:8000/db-health
+                        '''
+                        echo 'Database connection verified'
+                    }
                     
                     echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
                     echo '  ✅ ALL HEALTH CHECKS PASSED'
