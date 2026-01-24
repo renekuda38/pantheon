@@ -1,8 +1,15 @@
+networks:
+  pantheon-network:
+    driver: bridge
+    name: pantheon-network
+
 services:
   # PostgreSQL databaza
   db:
-    image: taskmaster-db:latest
+    image: postgres-taskmaster-db:${IMAGE_TAG:-latest} 
     container_name: taskmaster-db
+    networks:
+      - pantheon-network
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -11,7 +18,15 @@ services:
       - "5432:5432"
     volumes:
       # init.sql sa spusti automaticky pri prvom starte
+      # funguje len hostovi -> /Users/renemartin/Desktop/pantheon/backend/init.sql
+      # cez jenkins agent (cez docker.sock) sa to hlada v /home/jenkins/agent/workspace/pantheon/backend/init.sql -> neexistuje na hostovi
+      # - Agent je v kontajneri, working directory: /home/jenkins/agent/workspace/pantheon/backend/                        
+      # - ./init.sql → /home/jenkins/agent/workspace/pantheon/backend/init.sql                                             
+      # - Docker daemon na hostovi hľadá túto cestu na macOS                                                               
+      # - Cesta /home/jenkins/agent/... na macOS neexistuje ❌
+      
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
       # persist data medzi restartami
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,8 +37,10 @@ services:
 
   # FastAPI aplikacia
   api:
-    image: taskmaster_api:latest
+    image: python-taskmaster-api:${IMAGE_TAG:-latest}
     container_name: taskmaster-api
+    networks:
+      - pantheon-network
     ports:
       - "8000:8000"
     environment:
