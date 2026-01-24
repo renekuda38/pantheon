@@ -93,17 +93,17 @@ pipeline {
                     
                     dir('backend') {
                         // Stop existing deployment
-                        sh 'docker-compose down || true'
+                        sh 'docker compose down || true'
                         
                         // Remove old containers
-                        sh 'docker-compose rm -f || true'
+                        sh 'docker compose rm -f || true'
                         
                         // Start all services
-                        sh 'docker-compose up -d'
+                        sh 'docker compose up -d'
                         
                         // Show status
                         echo 'Container status:'
-                        sh 'docker-compose ps'
+                        sh 'docker compose ps'
                     }
                     
                     echo '✓ Deployment completed'
