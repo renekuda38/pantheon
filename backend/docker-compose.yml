@@ -22,9 +22,7 @@ services:
 
   # FastAPI aplikacia
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: taskmaster_api:latest
     container_name: taskmaster-api
     ports:
       - "8000:8000"
