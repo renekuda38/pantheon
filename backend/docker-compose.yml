@@ -1,7 +1,7 @@
 services:
   # PostgreSQL databaza
   db:
-    image: postgres:16-alpine
+    image: taskmaster-db:latest
     container_name: taskmaster-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       # init.sql sa spusti automaticky pri prvom starte
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       # persist data medzi restartami
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
