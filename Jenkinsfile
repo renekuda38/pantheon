@@ -7,8 +7,8 @@ pipeline {
         // add uv to PATH, later will be integrated in Dockerfile together with uv installation
         PATH = "/var/jenkins_home/.local/bin:${env.PATH}"
 
-        DOCKER_IMAGE_API = "taskmaster_api"
-        DOCKER_IMAGE_DB = "taskmaster-db" 
+        DOCKER_IMAGE_API = "python-taskmaster-api"
+        DOCKER_IMAGE_DB = "postgres-taskmaster-db" 
         DOCKER_TAG = "${env.BUILD_NUMBER}"
 
         POSTGRES_PASSWORD = credentials('postgres-password')
@@ -80,10 +80,10 @@ pipeline {
 
                 dir('backend') {
                     script {
-                        def customImage = docker.build("${DOCKER_IMAGE_API}:${DOCKER_TAG}")
+                        def customImage = docker.build("${DOCKER_IMAGE_API}:${DOCKER_TAG}", "-f Dockerfile.api .")
                         customImage.tag('latest')
 
-                        def dbImage = docker.build("${DOCKER_IMAGE_DB}:${DOCKER_TAG}", "-f Dockerfile.postgres .")
+                        def dbImage = docker.build("${DOCKER_IMAGE_DB}:${DOCKER_TAG}", "-f Dockerfile.db .")
                         dbImage.tag('latest')
                     }
                 }
@@ -98,27 +98,21 @@ pipeline {
                     echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
                     
                     dir('backend') {
-
-                        sh '''
-                            cat > .env << EOF
-                            POSTGRES_USER=taskmaster
-                            POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-                            POSTGRES_DB=taskmaster_db
-                            DATABASE_URL=postgresql://taskmaster:${POSTGRES_PASSWORD}@db:5432/taskmaster_db
-                            EOF
-                        '''
-                        // Stop existing deployment
-                        sh 'docker compose down || true'
-                        
-                        // Remove old containers
-                        sh 'docker compose rm -f || true'
-                        
-                        // Start all services
-                        sh 'docker compose up -d'
-                        
-                        // Show status
-                        echo 'Container status:'
-                        sh 'docker compose ps'
+                        withCredentials([string(credentialsId: 'postgres-password', variable: 'DB_PASS')]) {
+                            sh '''                                                                                                                                                                                                                 
+                                docker compose down || true                                                                                                                                                                                        
+                                docker compose rm -f || true                                                                                                                                                                                       
+                                                                                                                                                                                                                                                    
+                                export POSTGRES_USER=taskmaster                                                                                                                                                                                    
+                                export POSTGRES_PASSWORD="\${DB_PASS}"                                                                                                                                                                              
+                                export POSTGRES_DB=taskmaster_db                                                                                                                                                                                   
+                                export DATABASE_URL="postgresql://taskmaster:\${DB_PASS}@db:5432/taskmaster_db"
+                                export IMAGE_TAG=${BUILD_NUMBER}                                                                                                                                     
+                                                                                                                                                                                                                                                    
+                                docker compose up -d                                                                                                                                                                                               
+                                docker compose ps                                                                                                                                                                                                  
+                            '''     
+                        }        
                     }
                     
                     echo '✓ Deployment completed'
