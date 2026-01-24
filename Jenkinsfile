@@ -142,7 +142,7 @@ pipeline {
                         // Check FastAPI liveness
                         echo 'Checking FastAPI liveness...'
                         sh '''
-                            chmod +x scripts/healthcheck_fastapi.sh
+                            chmod +x healthcheck_fastapi.sh
                             ./healthcheck_fastapi.sh http://localhost:8000/health
                         '''
                         echo 'FastAPI process is running'
