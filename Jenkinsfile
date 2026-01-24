@@ -131,20 +131,21 @@ pipeline {
                     echo 'Waiting for services to initialize...'
                     sleep(time: 15, unit: 'SECONDS')
                     
+                    sh 'docker network connect pantheon-network jenkins-agent-docker01 || true'
 
                     dir('scripts') {
                         // Check FastAPI liveness
                         echo 'Checking FastAPI liveness...'
                         sh '''
                             chmod +x healthcheck_fastapi.sh
-                            ./healthcheck_fastapi.sh http://host.docker.internal:8000/health
+                            ./healthcheck_fastapi.sh http://taskmaster-api:8000/health
                         '''
                         echo 'FastAPI process is running'
                         
                         // Check database readiness
                         echo 'Checking database connection...'
                         sh '''
-                            ./healthcheck_fastapi.sh http://host.docker.internal:8000/db-health
+                            ./healthcheck_fastapi.sh http://taskmaster-api:8000/db-health
                         '''
                         echo 'Database connection verified'
                     }
