@@ -172,7 +172,8 @@ pipeline {
             echo '  🎉 PIPELINE COMPLETED SUCCESSFULLY'
             echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
             echo "✓ Build: ${env.BUILD_NUMBER}"
-            echo "✓ Image: ${DOCKER_IMAGE}:${IMAGE_TAG}"
+            echo "✓ API Image: ${DOCKER_IMAGE_API}:${DOCKER_TAG}"
+            echo "✓ DB Image: ${DOCKER_IMAGE_DB}:${DOCKER_TAG}"
             echo "✓ Health: All checks passed"
             echo "✓ Access: http://host.docker.internal:8000"
             echo "✓ Docs: http://host.docker.internal:8000/docs"
