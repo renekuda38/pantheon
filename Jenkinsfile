@@ -7,7 +7,8 @@ pipeline {
         // add uv to PATH, later will be integrated in Dockerfile together with uv installation
         PATH = "/var/jenkins_home/.local/bin:${env.PATH}"
 
-        DOCKER_IMAGE = "taskmaster_api"
+        DOCKER_IMAGE_API = "taskmaster_api"
+        DOCKER_IMAGE_DB = "taskmaster-db" 
         DOCKER_TAG = "${env.BUILD_NUMBER}"
 
         POSTGRES_PASSWORD = credentials('postgres-password')
@@ -79,8 +80,11 @@ pipeline {
 
                 dir('backend') {
                     script {
-                        def customImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                        def customImage = docker.build("${DOCKER_IMAGE_API}:${DOCKER_TAG}")
                         customImage.tag('latest')
+
+                        def dbImage = docker.build("${DOCKER_IMAGE_DB}:${DOCKER_TAG}", "-f Dockerfile.postgres .")
+                        dbImage.tag('latest')
                     }
                 }
             }
