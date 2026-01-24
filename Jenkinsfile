@@ -9,6 +9,8 @@ pipeline {
 
         DOCKER_IMAGE = "taskmaster_api"
         DOCKER_TAG = "${env.BUILD_NUMBER}"
+
+        POSTGRES_PASSWORD = credentials('postgres-password')
     }  
     
 
@@ -92,6 +94,15 @@ pipeline {
                     echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
                     
                     dir('backend') {
+
+                        sh '''
+                            cat > .env << EOF
+                            POSTGRES_USER=taskmaster
+                            POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+                            POSTGRES_DB=taskmaster_db
+                            DATABASE_URL=postgresql://taskmaster:${POSTGRES_PASSWORD}@db:5432/taskmaster_db
+                            EOF
+                        '''
                         // Stop existing deployment
                         sh 'docker compose down || true'
                         
