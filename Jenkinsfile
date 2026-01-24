@@ -143,14 +143,14 @@ pipeline {
                         echo 'Checking FastAPI liveness...'
                         sh '''
                             chmod +x healthcheck_fastapi.sh
-                            ./healthcheck_fastapi.sh http://localhost:8000/health
+                            ./healthcheck_fastapi.sh http://host.docker.internal:8000/health
                         '''
                         echo 'FastAPI process is running'
                         
                         // Check database readiness
                         echo 'Checking database connection...'
                         sh '''
-                            ./healthcheck_fastapi.sh http://localhost:8000/db-health
+                            ./healthcheck_fastapi.sh http://host.docker.internal:8000/db-health
                         '''
                         echo 'Database connection verified'
                     }
