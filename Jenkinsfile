@@ -174,8 +174,8 @@ pipeline {
             echo "✓ Build: ${env.BUILD_NUMBER}"
             echo "✓ Image: ${DOCKER_IMAGE}:${IMAGE_TAG}"
             echo "✓ Health: All checks passed"
-            echo "✓ Access: http://localhost:8000"
-            echo "✓ Docs: http://localhost:8000/docs"
+            echo "✓ Access: http://host.docker.internal:8000"
+            echo "✓ Docs: http://host.docker.internal:8000/docs"
         }
         
         failure {
