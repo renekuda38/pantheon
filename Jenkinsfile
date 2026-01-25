@@ -172,8 +172,7 @@ pipeline {
             echo "✓ API Image: ${DOCKER_IMAGE_API}:${IMAGE_TAG}"
             echo "✓ DB Image: ${DOCKER_IMAGE_DB}:${IMAGE_TAG}"
             echo "✓ Health: All checks passed"
-            echo "✓ Access: http://host.docker.internal:8000"
-            echo "✓ Docs: http://host.docker.internal:8000/docs"
+            echo "✓ Access: http://taskmaster-api:8000"
         }
         
         failure {
@@ -183,7 +182,7 @@ pipeline {
             
             dir('backend') {
                 echo 'Recent container logs:'
-                sh 'docker-compose logs --tail=100 || true'
+                sh 'docker compose logs --tail=100 || true'
             }
         }
         
