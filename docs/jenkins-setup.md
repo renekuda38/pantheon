@@ -1,6 +1,6 @@
 # Jenkins Master-Agent Setup Guide
 
-Kompletný sprievodca nastavením Jenkins CI/CD prostredia s master-worker architektúrou pomocou Docker kontajnerov.
+Complete guide for setting up Jenkins CI/CD environment with master-worker architecture using Docker containers.
 
 ---
 
@@ -40,7 +40,7 @@ Kompletný sprievodca nastavením Jenkins CI/CD prostredia s master-worker archi
 
 ### Option A: Docker Compose (Recommended)
 
-Používa `docker-compose.jenkins.yml` pre konzistentný a reprodukovateľný setup.
+Uses `docker-compose.jenkins.yml` for consistent and reproducible setup.
 
 ```bash
 # Start Jenkins master
@@ -55,7 +55,7 @@ docker compose -f docker-compose.jenkins.yml logs jenkins-master
 
 ### Option B: Docker Run
 
-Alternatívny prístup pomocou priamych `docker run` príkazov.
+Alternative approach using direct `docker run` commands.
 
 ```bash
 # 1. Create network (if not exists)
@@ -115,7 +115,39 @@ docker exec jenkins-master jenkins-plugin-cli --plugins \
   docker-plugin
 ```
 
-### 4. Create Node for Agent
+### 4. Create Multibranch Pipeline
+
+**New Item → Multibranch Pipeline**
+
+| Setting | Value |
+|---------|-------|
+| Name | `taskmaster-pipeline` (or your preferred name) |
+| Display Name | `master` |
+| Branch Sources | Add source → Git |
+| Repository URL | Your GitHub repository `.git` URL |
+| Scan Multibranch Pipeline Triggers | Periodically if not otherwise run → 1 minute (or your preference) |
+| Docker label | `python docker linux uv` |
+
+Click **Save** to create the pipeline.
+
+### 5. Configure Credentials for Pipeline
+
+Since the Jenkinsfile uses `withCredentials`, you need to create credentials in Jenkins UI.
+
+**Manage Jenkins → Security → Credentials → System → Global credentials → Add Credentials**
+
+| Setting | Value |
+|---------|-------|
+| Kind | Secret text |
+| Secret | Your actual password/secret value |
+| ID | `postgres-password` (or match the ID used in your Jenkinsfile) |
+| Description | PostgreSQL password (optional) |
+
+Click **Save** to create the credential.
+
+**Note:** Repeat this process for any other secrets referenced in your Jenkinsfile using `withCredentials`.
+
+### 6. Create Node for Agent
 
 **Manage Jenkins → Nodes → New Node**
 
@@ -128,7 +160,7 @@ docker exec jenkins-master jenkins-plugin-cli --plugins \
 | Usage | Use this node as much as possible |
 | Launch method | **Launch agent by connecting it to the controller** |
 
-### 5. Get Agent Secret
+### 7. Get Agent Secret
 
 1. Click **Save**
 2. Click on the newly created node name
@@ -139,7 +171,7 @@ docker exec jenkins-master jenkins-plugin-cli --plugins \
 
 ## Start Jenkins Agent (Inbound Agent)
 
-Agent založený na oficiálnom `jenkins/inbound-agent` image s Docker a Python podporou.
+Agent based on the official `jenkins/inbound-agent` image with Docker and Python support.
 
 ### Option A: Docker Compose (Recommended)
 
@@ -196,7 +228,7 @@ docker run -d \
 
 ## Start Jenkins Agent (Ubuntu Agent)
 
-Custom agent založený na `ubuntu:24.04` s **uv** package managerom, Docker CLI a Python 3. Vhodný pre projekty používajúce moderný Python tooling.
+Custom agent based on `ubuntu:24.04` with **uv** package manager, Docker CLI and Python 3. Suitable for projects using modern Python tooling.
 
 ### Option A: Docker Compose (Recommended)
 
@@ -252,12 +284,12 @@ docker run -d \
 
 | Parameter | Description |
 |-----------|-------------|
-| `--network pantheon-network` | Rovnaká sieť ako backend kontajnery (api, db) - umožňuje komunikáciu medzi kontajnermi cez hostname |
-| `-v /var/run/docker.sock:/var/run/docker.sock` | Mount Docker socketu pre Docker-in-Docker buildy. **⚠️ Security risk** - viď sekciu nižšie |
-| `-url http://jenkins-master:8080` | Jenkins master URL. Používa container name ako hostname v rámci Docker siete |
-| `-secret <token>` | Autentifikačný token z Jenkins UI. Nikdy necommituj do gitu! Použi `.env` súbor |
-| `-name docker-worker` alebo `-name ubuntu-worker` | Musí **presne** zodpovedať názvu node v Jenkins UI |
-| `-workDir /home/jenkins/agent` | Pracovný adresár agenta kde sa ukladajú workspace súbory |
+| `--network pantheon-network` | Same network as backend containers (api, db) - enables communication between containers via hostname |
+| `-v /var/run/docker.sock:/var/run/docker.sock` | Mount Docker socket for Docker-in-Docker builds. **⚠️ Security risk** - see section below |
+| `-url http://jenkins-master:8080` | Jenkins master URL. Uses container name as hostname within Docker network |
+| `-secret <token>` | Authentication token from Jenkins UI. Never commit to git! Use `.env` file |
+| `-name docker-worker` or `-name ubuntu-worker` | Must **exactly** match the node name in Jenkins UI |
+| `-workDir /home/jenkins/agent` | Agent working directory where workspace files are stored |
 
 ---
 
@@ -265,30 +297,30 @@ docker run -d \
 
 ### Docker Socket Mount
 
-**⚠️ Docker socket mount (`/var/run/docker.sock`) = root prístup k host systému!**
+**⚠️ Docker socket mount (`/var/run/docker.sock`) = root access to host system!**
 
-- Aktuálny setup je len pre **dev/learning účely**
-- Kontajner s prístupom k Docker socketu môže:
-  - Spúšťať privilegované kontajnery
-  - Pristupovať k host súborovému systému
-  - Potenciálne eskalovať privilégiá na host
+- Current setup is only for **dev/learning purposes**
+- Container with access to Docker socket can:
+  - Run privileged containers
+  - Access host filesystem
+  - Potentially escalate privileges on host
 
 ### Production Alternatives
 
-| Riešenie | Popis | Bezpečnosť |
+| Solution | Description | Security |
 |----------|-------|------------|
-| **Kaniko** | Rootless image builds | ✅ Najlepšia |
-| **Docker-in-Docker** | Privileged container s vlastným Docker daemonom | ⚠️ Stredná |
-| **SSH Agents** | Dedicated build VM s SSH prístupom | ✅ Dobrá |
-| **Kubernetes Agents** | Ephemeral pods pre buildy | ✅ Dobrá |
+| **Kaniko** | Rootless image builds | ✅ Best |
+| **Docker-in-Docker** | Privileged container with own Docker daemon | ⚠️ Medium |
+| **SSH Agents** | Dedicated build VM with SSH access | ✅ Good |
+| **Kubernetes Agents** | Ephemeral pods for builds | ✅ Good |
 
 ### Best Practices
 
-- **Never** commituj secrets do git repozitára
-- Použi `.env` súbory pre secrets (sú v `.gitignore`)
-- V produkcii použi Jenkins Credentials Manager
-- Rotuj secrets pravidelne
-- Použi RBAC pre Jenkins používateľov
+- **Never** commit secrets to git repository
+- Use `.env` files for secrets (they are in `.gitignore`)
+- In production use Jenkins Credentials Manager
+- Rotate secrets regularly
+- Use RBAC for Jenkins users
 
 ---
 
