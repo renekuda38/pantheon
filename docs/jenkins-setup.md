@@ -44,13 +44,13 @@ Používa `docker-compose.jenkins.yml` pre konzistentný a reprodukovateľný se
 
 ```bash
 # Start Jenkins master
-docker-compose -f docker-compose.jenkins.yml up -d jenkins-master
+docker compose -f docker-compose.jenkins.yml up -d jenkins-master
 
 # Verify container is running
 docker ps | grep jenkins-master
 
 # Check logs for initial admin password
-docker-compose -f docker-compose.jenkins.yml logs jenkins-master
+docker compose -f docker-compose.jenkins.yml logs jenkins-master
 ```
 
 ### Option B: Docker Run
@@ -85,8 +85,8 @@ docker run -d \
 ### 1. Get Initial Admin Password
 
 ```bash
-# From docker-compose
-docker-compose -f docker-compose.jenkins.yml logs jenkins-master | grep -A 5 "initial"
+# From docker compose
+docker compose -f docker-compose.jenkins.yml logs jenkins-master | grep -A 5 "initial"
 
 # Or directly from container
 docker exec jenkins-master cat /var/jenkins_home/secrets/initialAdminPassword
@@ -151,26 +151,26 @@ cp .env.jenkins.example .env.jenkins
 # JENKINS_AGENT_SECRET=<your-secret-here>
 
 # 3. Start agent
-docker-compose -f docker-compose.jenkins.yml --env-file .env.jenkins up -d jenkins-agent
+docker compose -f docker-compose.jenkins.yml --env-file .env.jenkins up -d jenkins-agent
 
 # 4. Verify agent is connected
-docker-compose -f docker-compose.jenkins.yml logs -f jenkins-agent
+docker compose -f docker-compose.jenkins.yml logs -f jenkins-agent
 ```
 
 **Useful commands:**
 ```bash
 # View logs
-docker-compose -f docker-compose.jenkins.yml logs -f jenkins-agent
+docker compose -f docker-compose.jenkins.yml logs -f jenkins-agent
 
 # Restart agent
-docker-compose -f docker-compose.jenkins.yml restart jenkins-agent
+docker compose -f docker-compose.jenkins.yml restart jenkins-agent
 
 # Rebuild after Dockerfile changes
-docker-compose -f docker-compose.jenkins.yml build jenkins-agent
-docker-compose -f docker-compose.jenkins.yml --env-file .env.jenkins up -d jenkins-agent
+docker compose -f docker-compose.jenkins.yml build jenkins-agent
+docker compose -f docker-compose.jenkins.yml --env-file .env.jenkins up -d jenkins-agent
 
 # Start everything (master + agent)
-docker-compose -f docker-compose.jenkins.yml --env-file .env.jenkins up -d
+docker compose -f docker-compose.jenkins.yml --env-file .env.jenkins up -d
 ```
 
 ### Option B: Docker Run
@@ -208,23 +208,23 @@ cp .env.jenkins-ubuntu.example .env.jenkins-ubuntu
 # JENKINS_UBUNTU_AGENT_SECRET=<your-secret-here>
 
 # 3. Build and start agent
-docker-compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkins-ubuntu up -d --build
+docker compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkins-ubuntu up -d --build
 
 # 4. Verify agent is connected
-docker-compose -f docker-compose.jenkins-agent-ubuntu.yml logs -f jenkins-agent-ubuntu
+docker compose -f docker-compose.jenkins-agent-ubuntu.yml logs -f jenkins-agent-ubuntu
 ```
 
 **Useful commands:**
 ```bash
 # View logs
-docker-compose -f docker-compose.jenkins-agent-ubuntu.yml logs -f jenkins-agent-ubuntu
+docker compose -f docker-compose.jenkins-agent-ubuntu.yml logs -f jenkins-agent-ubuntu
 
 # Restart agent
-docker-compose -f docker-compose.jenkins-agent-ubuntu.yml restart jenkins-agent-ubuntu
+docker compose -f docker-compose.jenkins-agent-ubuntu.yml restart jenkins-agent-ubuntu
 
 # Rebuild after Dockerfile changes
-docker-compose -f docker-compose.jenkins-agent-ubuntu.yml build
-docker-compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkins-ubuntu up -d
+docker compose -f docker-compose.jenkins-agent-ubuntu.yml build
+docker compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkins-ubuntu up -d
 ```
 
 ### Option B: Docker Run
@@ -421,8 +421,8 @@ docker logs -f jenkins-master  # Follow/tail
 docker logs jenkins-agent-docker01
 docker logs jenkins-agent-ubuntu01
 
-# With docker-compose
-docker-compose -f docker-compose.jenkins.yml logs -f
+# With docker compose
+docker compose -f docker-compose.jenkins.yml logs -f
 ```
 
 ### Container Lifecycle
@@ -440,9 +440,9 @@ docker restart jenkins-master
 # Remove containers (keeps volumes)
 docker rm jenkins-agent-docker01
 
-# With docker-compose
-docker-compose -f docker-compose.jenkins.yml down      # Stop and remove
-docker-compose -f docker-compose.jenkins.yml down -v   # Also remove volumes
+# With docker compose
+docker compose -f docker-compose.jenkins.yml down      # Stop and remove
+docker compose -f docker-compose.jenkins.yml down -v   # Also remove volumes
 ```
 
 ### Execute Commands Inside Container
