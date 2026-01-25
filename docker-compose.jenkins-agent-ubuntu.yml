@@ -1,0 +1,29 @@
+networks:
+  pantheon-network:
+    external: true
+    name: pantheon-network
+
+services:
+  jenkins-agent-ubuntu:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins-ubuntu
+    image: jenkins-ubuntu-agent:latest
+    container_name: jenkins-agent-ubuntu01
+    restart: unless-stopped
+    networks:
+      - pantheon-network
+    volumes:
+      # Docker socket for DinD builds (dev only - security risk in prod!)
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      JENKINS_URL: http://jenkins-master:8080
+      JENKINS_AGENT_NAME: ubuntu-worker
+      JENKINS_AGENT_WORKDIR: /home/jenkins/agent
+      # Secret from Jenkins UI - store in .env file
+      JENKINS_SECRET: ${JENKINS_UBUNTU_AGENT_SECRET}
+    command: >
+      -url http://jenkins-master:8080
+      -secret ${JENKINS_UBUNTU_AGENT_SECRET}
+      -name ubuntu-worker
+      -workDir /home/jenkins/agent
