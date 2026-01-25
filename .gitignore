@@ -6,6 +6,8 @@ __pycache__/
 
 # Environment variables
 .env
+.env.jenkins
+.env.jenkins-ubuntu
 
 # Logs
 *.log
