@@ -26,3 +26,9 @@ ENV PATH="/home/jenkins/.local/bin:${PATH}"
 
 # dat to vyssie? pred alebo za USER jenkins riadok
 WORKDIR /home/jenkins/agent 
+
+# Entrypoint - fixes docker.sock permissions, then runs as jenkins
+USER root
+COPY scripts/jenkins-agent-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
