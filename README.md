@@ -39,22 +39,27 @@ All detailed project documentation is located in the docs/ directory. Please ref
     * **requirements-dev.lock**: Locked development dependencies (pytest, httpx).
     * **requirements.txt**: Pip-compatible dependency list.
 
-* **scripts/**: Includes bash scripts for health checks of the Jenkins service and the FastAPI application.
-    * **.env.example**: Template for healthcheck script configuration (URLs, tokens, SSL settings).
-    * **healthcheck_fastapi.sh**: Liveness/readiness probe for FastAPI with retry logic and exponential backoff.
-    * **healthcheck_jenkins.sh**: Jenkins health check with Basic auth support and retry mechanism.
-
 * **docs/**: Centralized directory for all project-related documentation and manuals.
     * **backend-local-development.md**: Local development guide with uv, Docker Compose, and testing workflows.
     * **devops-learning-plan-tasks.md**: Structured learning roadmap with 11 progressive DevOps tasks.
     * **jenkins-setup.md**: Jenkins master-agent architecture setup, Docker agents, and CI/CD configuration.
 
+* **scripts/**: Includes bash scripts for health checks of the Jenkins service and the FastAPI application.
+    * **.env.example**: Template for healthcheck script configuration (URLs, tokens, SSL settings).
+    * **healthcheck_fastapi.sh**: Liveness/readiness probe for FastAPI with retry logic and exponential backoff.
+    * **healthcheck_jenkins.sh**: Jenkins health check with Basic auth support and retry mechanism.
+
+* **.env.jenkins.example**: Template for Jenkins inbound agent secret configuration.
+* **.env.jenkins-ubuntu.example**: Template for Jenkins Ubuntu agent secret configuration.
 * **.gitignore**: Git ignore rules for Python cache, environments, logs, and sensitive files.
+* **docker-compose.jenkins.yml**: Jenkins master + inbound agent stack with networking, volumes, and health checks.
+* **docker-compose.jenkins-agent-ubuntu.yml**: Ubuntu-based Jenkins agent stack for projects using uv package manager.
 * **Dockerfile.jenkins-agent**: Jenkins inbound agent with Docker CLI, uv, and Python for CI/CD builds.
 * **Dockerfile.jenkins-ubuntu**: Ubuntu-based Jenkins agent with full toolchain (Java, Docker, uv, Python).
 * **Jenkinsfile**: Declarative pipeline with stages: checkout, install, test, build, deploy, healthcheck.
 * **setup.md**: Quick reference for running the development environment setup script.
-* **setup.sh**: Automated setup script installing Docker, Python, uv, and configuring the environment.
+* **setup.sh**: Automated setup script installing Docker, Python, uv, and configuring the environment (Debian/Ubuntu).
+* **setup-dnf.sh**: Automated setup script for Fedora/RHEL-based systems using dnf package manager.
 ---
 
 ## Quick Start
