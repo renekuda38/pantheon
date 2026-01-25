@@ -25,11 +25,12 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ENV PATH="/home/jenkins/.local/bin:${PATH}"
 
-# dat to vyssie? pred alebo za USER jenkins riadok
-WORKDIR /home/jenkins/agent 
+WORKDIR /home/jenkins/agent
 
-# Entrypoint - fixes docker.sock permissions, then runs as jenkins
+# Copy universal entrypoint script and set permissions
 USER root
 COPY scripts/jenkins-agent-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+# Entrypoint - fixes docker.sock permissions, then runs agent as jenkins user
 ENTRYPOINT ["/entrypoint.sh"]
