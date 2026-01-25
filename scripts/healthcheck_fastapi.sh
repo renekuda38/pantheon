@@ -11,7 +11,8 @@ if [[ -f "${SCRIPT_DIR}/.env" ]]; then
 fi
 
 # Configuration
-FASTAPI_URL="${1:-http://taskmaster-api:8000/health}"
+# work also with localhost, correct address specified in Jenkinsfile
+FASTAPI_URL="${1:-http://localhost:8000/health}"
 # not implemented yet, but placeholder for future use
 FASTAPI_TOKEN="${FASTAPI_TOKEN:-}"
 # do nothing if using HTTP (it could be false or true), works only for HTTPS
