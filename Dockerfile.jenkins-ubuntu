@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
     gnupg \
-    lsb-release
+    lsb-release \
+    gosu
 
 # Docker CLI (without daemon)
 RUN install -m 0755 -d /etc/apt/keyrings \
@@ -66,6 +67,11 @@ WORKDIR /home/jenkins/agent
 # Expose Jenkins agent port (optional, for visibility)
 EXPOSE 50000
 
-# Entry point pre Jenkins agent
-# Note: Jenkins master poskytne URL, secret, name pri štarte
-ENTRYPOINT ["java", "-jar", "/home/jenkins/agent.jar"]
+# Copy universal entrypoint script and set permissions
+USER root
+COPY scripts/jenkins-agent-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Entrypoint - fixes docker.sock permissions, then runs agent as jenkins user
+# Note: Jenkins master will provide URL, secret, name at startup as arguments
+ENTRYPOINT ["/entrypoint.sh"]
