@@ -12,10 +12,10 @@ All detailed project documentation is located in the docs/ directory. Please ref
   * Quick reference for running the development environment setup script, including optional Git configuration.
 * **[DevOps Learning Plan](./docs/devops-learning-plan-tasks.md)**
   * A structured roadmap containing 11 tasks covering Linux basics, Python environment management, containerization, and CI/CD automation.
-* **[App and Environment Setup](./docs/app-virtual-env-uv.md)**
-  * Instructions for managing the Python environment using the uv package manager, installing dependencies, and running the FastAPI application.
+* **[Backend Local Development](./docs/backend-local-development.md)**
+  * Local development guide covering Python environment setup with uv, dependency management (editable installs vs lock files), Docker Compose workflow, and API testing.
 * **[Jenkins Setup](./docs/jenkins-setup.md)**
-  * Documentation for local Jenkins development, including persistent volume creation, plugin management, and Docker agent configuration.
+  * Complete Jenkins CI/CD setup guide including master-agent architecture, Docker-based agents, persistent volumes, plugin management, and backup strategies.
 ---
 
 ## Project Structure
@@ -45,9 +45,9 @@ All detailed project documentation is located in the docs/ directory. Please ref
     * **healthcheck_jenkins.sh**: Jenkins health check with Basic auth support and retry mechanism.
 
 * **docs/**: Centralized directory for all project-related documentation and manuals.
-    * **app-virtual-env-uv.md**: Guide for Python environment setup using uv package manager.
+    * **backend-local-development.md**: Local development guide with uv, Docker Compose, and testing workflows.
     * **devops-learning-plan-tasks.md**: Structured learning roadmap with 11 progressive DevOps tasks.
-    * **jenkins-setup.md**: Jenkins master-agent architecture setup and configuration guide.
+    * **jenkins-setup.md**: Jenkins master-agent architecture setup, Docker agents, and CI/CD configuration.
 
 * **.gitignore**: Git ignore rules for Python cache, environments, logs, and sensitive files.
 * **Dockerfile.jenkins-agent**: Jenkins inbound agent with Docker CLI, uv, and Python for CI/CD builds.
@@ -65,4 +65,13 @@ To set up the development environment (see [setup.md](./setup.md) for details), 
 chmod +x setup.sh
 sudo ./setup.sh
 ```
+
+## Next Steps
+
+After running `setup.sh`, you can:
+
+1. **Start local development** - Follow [Backend Local Development](./docs/backend-local-development.md) to set up Python environment, run containers with Docker Compose, and test the API.
+
+2. **Set up Jenkins CI/CD** - Follow [Jenkins Setup](./docs/jenkins-setup.md) to configure Jenkins master with Docker-based agents for automated builds and deployments.
+
 ---
