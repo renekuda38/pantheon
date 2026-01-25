@@ -267,7 +267,7 @@ echo "  1. Logout and login again (to apply docker group membership)"
 echo "  2. Navigate to your project: cd ${SCRIPT_DIR}"
 echo "  3. Copy backend/.env.example to backend/.env and configure it"
 echo "  4. Initialize backend: cd backend && uv venv && source .venv/bin/activate"
-echo "  5. Install dependencies: uv pip install -r requirements.txt"
+echo "  5. Install dependencies: uv pip install -e \".[dev]\""
 echo "  6. Start development: docker compose up -d"
 echo ""
 
