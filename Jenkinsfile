@@ -9,9 +9,7 @@ pipeline {
 
         DOCKER_IMAGE_API = "python-taskmaster-api"
         DOCKER_IMAGE_DB = "postgres-taskmaster-db" 
-        DOCKER_TAG = "${env.BUILD_NUMBER}"
-
-        POSTGRES_PASSWORD = credentials('postgres-password')
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
     }  
     
 
@@ -80,10 +78,10 @@ pipeline {
 
                 dir('backend') {
                     script {
-                        def customImage = docker.build("${DOCKER_IMAGE_API}:${DOCKER_TAG}", "-f Dockerfile.api .")
+                        def customImage = docker.build("${DOCKER_IMAGE_API}:${IMAGE_TAG}", "-f Dockerfile.api .")
                         customImage.tag('latest')
 
-                        def dbImage = docker.build("${DOCKER_IMAGE_DB}:${DOCKER_TAG}", "-f Dockerfile.db .")
+                        def dbImage = docker.build("${DOCKER_IMAGE_DB}:${IMAGE_TAG}", "-f Dockerfile.db .")
                         dbImage.tag('latest')
                     }
                 }
@@ -102,11 +100,15 @@ pipeline {
                             sh '''                                                                                                                                                                                                                 
                                 docker compose down || true                                                                                                                                                                                        
                                 docker compose rm -f || true                                                                                                                                                                                       
-                                                                                                                                                                                                                                                    
+
+                                # # # env vars for db service                                                                                                                                                                                                      
                                 export POSTGRES_USER=taskmaster                                                                                                                                                                                    
                                 export POSTGRES_PASSWORD="\${DB_PASS}"                                                                                                                                                                              
-                                export POSTGRES_DB=taskmaster_db                                                                                                                                                                                   
+                                export POSTGRES_DB=taskmaster_db      
+
+                                # # # env vars for api service   
                                 export DATABASE_URL="postgresql://taskmaster:\${DB_PASS}@db:5432/taskmaster_db"
+
                                 export IMAGE_TAG=${BUILD_NUMBER}                                                                                                                                     
                                                                                                                                                                                                                                                     
                                 docker compose up -d                                                                                                                                                                                               
@@ -167,8 +169,8 @@ pipeline {
             echo '  🎉 PIPELINE COMPLETED SUCCESSFULLY'
             echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
             echo "✓ Build: ${env.BUILD_NUMBER}"
-            echo "✓ API Image: ${DOCKER_IMAGE_API}:${DOCKER_TAG}"
-            echo "✓ DB Image: ${DOCKER_IMAGE_DB}:${DOCKER_TAG}"
+            echo "✓ API Image: ${DOCKER_IMAGE_API}:${IMAGE_TAG}"
+            echo "✓ DB Image: ${DOCKER_IMAGE_DB}:${IMAGE_TAG}"
             echo "✓ Health: All checks passed"
             echo "✓ Access: http://host.docker.internal:8000"
             echo "✓ Docs: http://host.docker.internal:8000/docs"
