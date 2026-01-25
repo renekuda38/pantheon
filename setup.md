@@ -34,3 +34,7 @@ If `.env` doesn't exist, git can be configured manually later.
 4. Initialize backend: `cd backend && uv venv && source .venv/bin/activate`
 5. Install dependencies: `uv pip install -e ".[dev]"`
 6. Start development: `docker compose up -d`
+
+**See [backend-local-development.md](docs/backend-local-development.md) for local development workflow**
+
+**See [jenkins-setup.md](docs/jenkins-setup.md) for local development workflow**
