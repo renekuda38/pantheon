@@ -1,5 +1,5 @@
 #!/bin/bash
-# Entrypoint script for Jenkins agent
+# Universal entrypoint script for Jenkins agents (both inbound and ubuntu)
 # Fixes docker.sock permissions before starting agent
 
 # Fix docker socket permissions (must run as root initially)
@@ -8,6 +8,12 @@ if [ -S /var/run/docker.sock ]; then
     chmod 660 /var/run/docker.sock
 fi
 
-# Drop privileges and run jenkins-agent as jenkins user
-# gosu replaces current process (like exec) and switches user
-exec gosu jenkins jenkins-agent "$@"
+# Detect which agent type and run appropriately
+# Drop privileges and run as jenkins user
+if command -v jenkins-agent >/dev/null 2>&1; then
+    # Inbound agent image (has jenkins-agent command built-in)
+    exec gosu jenkins jenkins-agent "$@"
+else
+    # Custom ubuntu agent (use java -jar agent.jar)
+    exec gosu jenkins java -jar /home/jenkins/agent.jar "$@"
+fi
