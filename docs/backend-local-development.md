@@ -105,10 +105,10 @@ cd backend
 cp .env.example .env
 
 # Build and start
-docker-compose up -d --build
+docker compose up -d --build
 
 # Follow logs
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ### Environment Variables and .env File
@@ -128,7 +128,7 @@ environment:
 POSTGRES_USER=taskmaster
 POSTGRES_PASSWORD=secretpassword123
 POSTGRES_DB=taskmaster_db
-DATABASE_URL=postgresql://taskmaster:secretpassword123@db:5432/taskmaster_db
+DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
 IMAGE_TAG=latest
 ```
 
@@ -148,7 +148,7 @@ echo ".env" >> .gitignore
 
 ```bash
 # Display interpolated values
-docker-compose config
+docker compose config
 
 # Output shows actual values instead of ${VARIABLE}
 ```
@@ -157,7 +157,7 @@ docker-compose config
 
 ## 4. Testing
 
-> **Prerequisite:** Containers must be running (`docker-compose up -d`)
+> **Prerequisite:** Containers must be running (`docker compose up -d`)
 
 ### Health Check
 
@@ -245,6 +245,6 @@ backend/
 | Run tests | `pytest -v` |
 | Update prod deps | `uv pip compile pyproject.toml -o requirements.lock` |
 | Update dev deps | `uv pip compile pyproject.toml --extra dev -o requirements-dev.lock` |
-| Docker build + run | `docker-compose up -d --build` |
-| Docker logs | `docker-compose logs -f api` |
-| Docker cleanup | `docker-compose down -v` |
+| Docker build + run | `docker compose up -d --build` |
+| Docker logs | `docker compose logs -f api` |
+| Docker cleanup | `docker compose down -v` |
