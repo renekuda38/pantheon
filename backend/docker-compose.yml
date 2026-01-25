@@ -7,6 +7,9 @@ services:
   # PostgreSQL databaza
   db:
     image: postgres-taskmaster-db:${IMAGE_TAG:-latest} 
+    build:
+      context: .
+      dockerfile: Dockerfile.db
     container_name: taskmaster-db
     networks:
       - pantheon-network
@@ -38,6 +41,9 @@ services:
   # FastAPI aplikacia
   api:
     image: python-taskmaster-api:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile.api
     container_name: taskmaster-api
     networks:
       - pantheon-network
