@@ -67,10 +67,21 @@ All detailed project documentation is located in the docs/ directory. Please ref
 
 To set up the development environment (see [setup.md](./setup.md) for details), run:
 
+* if you work on Ubuntu (tested), Debian and its derivates (like Kali Linux, Parrot OS, Linux Mint, etc.)
+
 ```bash
 chmod +x setup.sh
 sudo ./setup.sh
 ```
+
+* if you work on Fedora (tested), CentOS, RHEL and its derivates (like Oracle Linux, AlmaLinux, Rocky Linux, etc.)
+
+```bash
+chmod +x setup-dnf.sh
+sudo ./setup-dnf.sh
+```
+
+Scripts should not work on Arch Linux (pacman), openSUSE (zypper), Alpine Linux (apk).
 
 ## Next Steps
 
