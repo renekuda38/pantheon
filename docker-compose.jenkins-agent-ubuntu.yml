@@ -7,7 +7,7 @@ services:
   jenkins-agent-ubuntu:
     build:
       context: .
-      dockerfile: Dockerfile.jenkins-ubuntu
+      dockerfile: Dockerfile.jenkins-agent-ubuntu
     image: jenkins-ubuntu-agent:latest
     container_name: jenkins-agent-ubuntu01
     restart: unless-stopped
