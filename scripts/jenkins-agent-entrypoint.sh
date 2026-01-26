@@ -3,17 +3,14 @@
 # Fixes docker.sock permissions before starting agent
 
 # Fix docker socket permissions (must run as root initially)
-if [ -S /var/run/docker.sock ]; then
-    chown root:docker /var/run/docker.sock
-    chmod 660 /var/run/docker.sock
-fi
-
-# Detect which agent type and run appropriately
-# Drop privileges and run as jenkins user
-if command -v jenkins-agent >/dev/null 2>&1; then
-    # Inbound agent image (has jenkins-agent command built-in)
-    exec gosu jenkins jenkins-agent "$@"
-else
-    # Custom ubuntu agent (use java -jar agent.jar)
-    exec gosu jenkins java -jar /home/jenkins/agent.jar "$@"
-fi
+                                                                                                                                                         
+if [ -S /var/run/docker.sock ]; then                                                                                                                        
+    sudo /bin/chown root:docker /var/run/docker.sock                                                                                                        
+    sudo /bin/chmod 660 /var/run/docker.sock                                                                                                                
+fi                                                                                                                                                          
+                                                                                                                                                            
+if command -v jenkins-agent >/dev/null 2>&1; then                                                                                                           
+    exec jenkins-agent "$@"                                                                                                                                 
+else                                                                                                                                                        
+    exec java -jar /home/jenkins/agent.jar "$@"                                                                                                             
+fi  
