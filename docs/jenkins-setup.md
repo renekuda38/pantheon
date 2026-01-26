@@ -165,7 +165,7 @@ Click **Save** to create the credential.
 1. Click **Save**
 2. Click on the newly created node name
 3. Copy the **SECRET** from the connection instructions
-4. Store the secret in `.env.jenkins` or `.env.jenkins-ubuntu` file
+4. Store the secret in `.env.jenkins` file
 
 ---
 
@@ -176,7 +176,7 @@ Agent based on the official `jenkins/inbound-agent` image with Docker and Python
 ### Option A: Docker Compose (Recommended)
 
 ```bash
-# 1. Copy example env file and add your secret
+# 1. Copy example env file and add your secret (or only edit .env.jenkins if you already have it)
 cp .env.jenkins.example .env.jenkins
 
 # 2. Edit .env.jenkins and paste your secret from Jenkins UI
@@ -233,14 +233,14 @@ Custom agent based on `ubuntu:24.04` with **uv** package manager, Docker CLI and
 ### Option A: Docker Compose (Recommended)
 
 ```bash
-# 1. Copy example env file and add your secret
-cp .env.jenkins-ubuntu.example .env.jenkins-ubuntu
+# 1. Copy example env file and add your secret (or only edit .env.jenkins if you already have it)
+cp .env.jenkins.example .env.jenkins
 
-# 2. Edit .env.jenkins-ubuntu and paste your secret from Jenkins UI
+# 2. Edit .env.jenkins and paste your secret from Jenkins UI
 # JENKINS_UBUNTU_AGENT_SECRET=<your-secret-here>
 
 # 3. Build and start agent
-docker compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkins-ubuntu up -d --build
+docker compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkins up -d --build
 
 # 4. Verify agent is connected
 docker compose -f docker-compose.jenkins-agent-ubuntu.yml logs -f jenkins-agent-ubuntu
@@ -256,7 +256,7 @@ docker compose -f docker-compose.jenkins-agent-ubuntu.yml restart jenkins-agent-
 
 # Rebuild after Dockerfile changes
 docker compose -f docker-compose.jenkins-agent-ubuntu.yml build
-docker compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkins-ubuntu up -d
+docker compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkins up -d
 ```
 
 ### Option B: Docker Run
