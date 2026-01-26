@@ -32,9 +32,6 @@ RUN install -m 0755 -d /etc/apt/keyrings \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-
-RUN groupadd docker
-
 # Create jenkins user (non-root)
 RUN useradd -m -s /bin/bash jenkins \
     && usermod -aG docker jenkins
