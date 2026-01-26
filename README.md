@@ -50,13 +50,12 @@ All detailed project documentation is located in the docs/ directory. Please ref
     * **healthcheck_jenkins.sh**: Jenkins health check with Basic auth support and retry mechanism.
     * **jenkins-agent-entrypoint.sh**: Fixes docker.sock permissions before starting agent 
 
-* **.env.jenkins.example**: Template for Jenkins inbound agent secret configuration.
-* **.env.jenkins-ubuntu.example**: Template for Jenkins Ubuntu agent secret configuration.
+* **.env.jenkins.example**: Template for Jenkins agents secret configuration.
 * **.gitignore**: Git ignore rules for Python cache, environments, logs, and sensitive files.
 * **docker-compose.jenkins.yml**: Jenkins master + inbound agent stack with networking, volumes, and health checks.
 * **docker-compose.jenkins-agent-ubuntu.yml**: Ubuntu-based Jenkins agent stack for projects using uv package manager.
 * **Dockerfile.jenkins-agent**: Jenkins inbound agent with Docker CLI, uv, and Python for CI/CD builds.
-* **Dockerfile.jenkins-ubuntu**: Ubuntu-based Jenkins agent with full toolchain (Java, Docker, uv, Python).
+* **Dockerfile.jenkins-agent-ubuntu**: Ubuntu-based Jenkins agent with full toolchain (Java, Docker, uv, Python).
 * **Jenkinsfile**: Declarative pipeline with stages: checkout, install, test, build, deploy, healthcheck.
 * **setup.md**: Quick reference for running the development environment setup script.
 * **setup.sh**: Automated setup script installing Docker, Python, uv, and configuring the environment (Debian/Ubuntu).

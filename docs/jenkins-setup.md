@@ -263,7 +263,7 @@ docker compose -f docker-compose.jenkins-agent-ubuntu.yml --env-file .env.jenkin
 
 ```bash
 # 1. Build agent image
-docker build -f Dockerfile.jenkins-ubuntu -t jenkins-ubuntu-agent:latest .
+docker build -f Dockerfile.jenkins-agent-ubuntu -t jenkins-ubuntu-agent:latest .
 
 # 2. Run agent container
 docker run -d \
