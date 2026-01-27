@@ -1,7 +1,5 @@
 FROM ubuntu:24.04
 
-USER root
-
 RUN ln -sf /bin/bash /bin/sh
 
 ENV SHELL=/bin/bash
@@ -9,8 +7,8 @@ ENV SHELL=/bin/bash
 # prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
+USER root
 RUN apt-get update && apt-get install -y \
-    sudo \
     openjdk-17-jdk \
     python3 \
     python3-pip \
@@ -20,7 +18,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
     gnupg \
-    lsb-release 
+    lsb-release \
+    gosu
 
 # Docker CLI (without daemon)
 RUN install -m 0755 -d /etc/apt/keyrings \
@@ -28,23 +27,20 @@ RUN install -m 0755 -d /etc/apt/keyrings \
     && chmod a+r /etc/apt/keyrings/docker.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
     && apt-get update \
-    && apt-get install -y docker-ce-cli docker-compose-plugin\
+    && apt-get install -y docker-ce-cli \
     # cleanup 
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m -s /bin/bash jenkins \
-    && groupadd -f docker \                                                    
-    && usermod -aG docker jenkins \                                         
-    && echo "jenkins ALL=(ALL) NOPASSWD: /bin/chown root\:docker /var/run/docker.sock, /bin/chmod 660 /var/run/docker.sock" > /etc/sudoers.d/jenkins-docker \                                             
-    && chmod 0440 /etc/sudoers.d/jenkins-docker
 
-# Copy universal entrypoint script and set permissions
-COPY --chmod=755 scripts/jenkins-agent-entrypoint.sh /entrypoint.sh
+RUN groupadd docker
+
+# Create jenkins user (non-root)
+RUN useradd -m -s /bin/bash jenkins \
+    && usermod -aG docker jenkins
 
 # Switch to jenkins user pre uv installation
 USER jenkins
-
 WORKDIR /home/jenkins
 
 # Install uv as jenkins user
@@ -53,23 +49,24 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 # Add uv to PATH
 ENV PATH="/home/jenkins/.local/bin:${PATH}"
 
-# Download Jenkins agent JAR
-RUN mkdir -p /home/jenkins/agent \
-    && curl -fsSL -o agent.jar http://host.docker.internal:8080/jnlpJars/agent.jar \
-    && test -f agent.jar \
-    && [ $(stat -c %s agent.jar) -gt 1000000 ] \
-    && java -jar agent.jar -version
+# Create agent directory (JAR will be downloaded at runtime)
+RUN mkdir -p /home/jenkins/agent
 
+# Verify tools are installed
 RUN java -version \
     && uv --version \
-    && docker --version \
-    && ls -lh agent.jar
+    && docker --version
 
 # Set working directory
 WORKDIR /home/jenkins/agent
 
 # Expose Jenkins agent port (optional, for visibility)
 EXPOSE 50000
+
+# Copy universal entrypoint script and set permissions
+USER root
+COPY scripts/jenkins-agent-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Entrypoint - fixes docker.sock permissions, then runs agent as jenkins user
 # Note: Jenkins master will provide URL, secret, name at startup as arguments
