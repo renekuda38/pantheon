@@ -48,7 +48,7 @@ All detailed project documentation is located in the docs/ directory. Please ref
     * **.env.example**: Template for healthcheck script configuration (URLs, tokens, SSL settings).
     * **healthcheck_fastapi.sh**: Liveness/readiness probe for FastAPI with retry logic and exponential backoff.
     * **healthcheck_jenkins.sh**: Jenkins health check with Basic auth support and retry mechanism.
-    * **jenkins-agent-entrypoint.sh**: Fixes docker.sock permissions before starting agent 
+    * **jenkins-agent-entrypoint.sh**: Fixes docker.sock permissions before starting agent and download agent.jar in runtime.
 
 * **.env.jenkins.example**: Template for Jenkins agents secret configuration.
 * **.gitignore**: Git ignore rules for Python cache, environments, logs, and sensitive files.
