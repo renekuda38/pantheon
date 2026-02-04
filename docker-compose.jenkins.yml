@@ -1,7 +1,7 @@
 networks:
-  pantheon-network:
+  jenkins-network:
     driver: bridge
-    name: pantheon-network
+    name: jenkins-network
 
 volumes:
   jenkins_home:
@@ -13,7 +13,7 @@ services:
     container_name: jenkins-master
     restart: unless-stopped
     networks:
-      - pantheon-network
+      - jenkins-network
     ports:
       - "8080:8080"   # Web UI
       - "50000:50000" # Agent communication (JNLP)
@@ -38,7 +38,7 @@ services:
     container_name: jenkins-agent-docker01
     restart: unless-stopped
     networks:
-      - pantheon-network
+      - jenkins-network
     depends_on:
       jenkins-master:
         condition: service_healthy

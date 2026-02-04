@@ -133,24 +133,37 @@ pipeline {
                     echo 'Waiting for services to initialize...'
                     sleep(time: 15, unit: 'SECONDS')
                     
-                    sh 'docker network connect pantheon-network jenkins-agent-docker01 || true'
+                    // find out the name of the Jenkins agent container
+                    def agentContainerName = sh(
+                        script: "cat /etc/hostname",
+                        returnStdout: true
+                    ).trim()
 
-                    dir('scripts') {
-                        // Check FastAPI liveness
-                        echo 'Checking FastAPI liveness...'
-                        sh '''
-                            chmod +x healthcheck_fastapi.sh
-                            ./healthcheck_fastapi.sh http://taskmaster-api:8000/health
-                        '''
-                        echo 'FastAPI process is running'
-                        
-                        // Check database readiness
-                        echo 'Checking database connection...'
-                        sh '''
-                            ./healthcheck_fastapi.sh http://taskmaster-api:8000/db-health
-                        '''
-                        echo 'Database connection verified'
+                    sh "docker network connect app-network ${agentContainerName} || true"
+
+                    try {
+                        dir('scripts') {
+                            // Check FastAPI liveness
+                            echo 'Checking FastAPI liveness...'
+                            sh '''
+                                chmod +x healthcheck_fastapi.sh
+                                ./healthcheck_fastapi.sh http://taskmaster-api:8000/health
+                            '''
+                            echo 'FastAPI process is running'
+                            
+                            // Check database readiness
+                            echo 'Checking database connection...'
+                            sh '''
+                                ./healthcheck_fastapi.sh http://taskmaster-api:8000/db-health
+                            '''
+                            echo 'Database connection verified'
+                        }
+                    } finally {
+                        // Disconnect the Jenkins agent container from the app network
+                        sh "docker network disconnect app-network ${agentContainerName} || true"
                     }
+
+                    sh "docker network disconnect app-network ${agentContainerName} || true"
                     
                     echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
                     echo '  ✅ ALL HEALTH CHECKS PASSED'

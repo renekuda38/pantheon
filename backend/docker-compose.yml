@@ -1,7 +1,7 @@
 networks:
-  pantheon-network:
+  app-network:
     driver: bridge
-    name: pantheon-network
+    name: app-network
 
 services:
   # PostgreSQL databaza
@@ -12,7 +12,7 @@ services:
       dockerfile: Dockerfile.db
     container_name: taskmaster-db
     networks:
-      - pantheon-network
+      - app-network
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -46,7 +46,7 @@ services:
       dockerfile: Dockerfile.api
     container_name: taskmaster-api
     networks:
-      - pantheon-network
+      - app-network
     ports:
       - "8000:8000"
     environment:
