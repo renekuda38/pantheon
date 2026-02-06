@@ -21,6 +21,18 @@
           - "--exclude=.git"
         delete: yes  # zmaze subory na dest ktore nie su v src
 
+    - name: create .env file on app-server
+      copy:
+        content: |
+          POSTGRES_USER=taskmaster
+          POSTGRES_PASSWORD=taskmaster123
+          POSTGRES_DB=taskmaster_db
+          DATABASE_URL=postgresql://taskmaster:taskmaster123@db:5432/taskmaster_db
+        dest: /opt/app/backend/.env
+        mode: '0600'
+        owner: deploy
+        group: deploy
+
     - name: run docker compose on app-server
       command: docker compose up -d --build
       args:
