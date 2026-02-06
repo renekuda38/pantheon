@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     curl \
     rsync \
+    ansible \
     sudo \
     ca-certificates \
     gnupg \
