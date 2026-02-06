@@ -27,7 +27,7 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 
 RUN groupadd -f docker \                                                    
     && usermod -aG docker jenkins \                                         
-    && echo "jenkins ALL=(ALL) NOPASSWD: /bin/chown root\:docker /var/run/docker.sock, /bin/chmod 660 /var/run/docker.sock" > /etc/sudoers.d/jenkins-docker \                                             
+    && echo "jenkins ALL=(ALL) NOPASSWD: /bin/chown root:docker /var/run/docker.sock, /bin/chmod 660 /var/run/docker.sock" > /etc/sudoers.d/jenkins-docker \                                             
     && chmod 0440 /etc/sudoers.d/jenkins-docker
 
 # Copy universal entrypoint script and set permissions
