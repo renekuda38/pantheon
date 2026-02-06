@@ -6,8 +6,8 @@ set -e
 
 # Fix docker socket permissions (must run as root initially)
 if [ -S /var/run/docker.sock ]; then
-    chown root:docker /var/run/docker.sock
-    chmod 660 /var/run/docker.sock
+    chown root:docker /var/run/docker.sock || true
+    chmod 660 /var/run/docker.sock || true
 fi
 
 # Detect which agent type and run appropriately
