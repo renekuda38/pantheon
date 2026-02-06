@@ -102,7 +102,7 @@ pipeline {
             echo '  ❌ PIPELINE FAILED'
             echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
             
-            sh 'ssh -o StrictHostKeyChecking=no \
+            sh 'sshpass -p deploy -o StrictHostKeyChecking=no \
                 -p 2222 deploy@host.docker.internal \
                 "cd /opt/app/backend && docker compose logs --tail=100" || true'
         }
