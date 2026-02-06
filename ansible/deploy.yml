@@ -1,0 +1,27 @@
+- name: Deploy fastapi app on app-server
+  hosts: app-servers
+  become: yes
+  
+  tasks:
+    - name: create destination folder on app-server
+      file: 
+        path: /opt/app 
+        state: directory 
+        mode: 0755 # best practice '0755' (with '')?
+        owner: deploy 
+        group: deploy
+
+    - name: copy backend files to app-server
+      synchronize:
+        src: ../backend/
+        dest: /opt/app/backend/
+        rsync_opts:
+          - "--exclude=__pycache__"
+          - "--exclude=*.pyc"
+          - "--exclude=.git"
+        delete: yes  # zmaze subory na dest ktore nie su v src
+
+    - name: run docker compose on app-server
+      command: docker compose up -d --build
+      args:
+        chdir: /opt/app/backend # working directory 
