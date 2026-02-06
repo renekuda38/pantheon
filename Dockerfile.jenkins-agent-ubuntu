@@ -16,10 +16,10 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     wget \
+    rsync \
     ca-certificates \
     gnupg \
-    lsb-release \
-    gosu
+    lsb-release 
 
 # Docker CLI (without daemon)
 RUN install -m 0755 -d /etc/apt/keyrings \
