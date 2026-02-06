@@ -1,0 +1,11 @@
+services:
+  app-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.app-server
+    container_name: app-server
+    ports:
+      - "2222:22" # ssh
+      - "8000:8000" # api
+      - "5432:5432" # db
+    privileged: true

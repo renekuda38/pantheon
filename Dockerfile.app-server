@@ -1,0 +1,62 @@
+FROM ubuntu:24.04
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install base packages + SSH server + Docker dependencies
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    sudo \
+    curl \
+    wget \
+    rsync \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    iptables \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Docker CE (full daemon, not just CLI)
+RUN install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+    && chmod a+r /etc/apt/keyrings/docker.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y \
+        docker-ce \
+        docker-ce-cli \
+        containerd.io \
+        docker-compose-plugin \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure SSH
+RUN mkdir /var/run/sshd \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Create deploy user for Ansible
+RUN useradd -m -s /bin/bash deploy \
+    && echo "deploy:deploy" | chpasswd \
+    && usermod -aG sudo deploy \
+    && usermod -aG docker deploy \
+    && echo "deploy ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Create directory for app deployment
+RUN mkdir -p /opt/app && chown deploy:deploy /opt/app
+
+# Create directory for supervisor logs
+RUN mkdir -p /var/log/supervisor
+
+# Supervisor config to run both dockerd and sshd
+COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Expose ports
+EXPOSE 22 8000 5432
+
+# Health check - verify both Docker and SSH are running
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD docker info > /dev/null 2>&1 && pgrep sshd > /dev/null
+
+# Supervisor as PID 1 - manages dockerd + sshd
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
